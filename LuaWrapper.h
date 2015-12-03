@@ -42,7 +42,8 @@ private:
 	lua_State * L;
 	void WriteAllData();
 	void WriteData(WrapperData*);
-	void ReadData();
+	void ReadAllData();
+	void ReadData(WrapperData*);
 
 	std::vector<WrapperData*> data;
 

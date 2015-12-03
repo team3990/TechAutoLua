@@ -6,6 +6,7 @@
  */
 
 #include "LuaWrapper.h"
+#include "string.h"
 
 LuaWrapper::LuaWrapper()
 {
@@ -47,6 +48,7 @@ void LuaWrapper::Update()
 	WriteAllData();
 	lua_getglobal(L, "update");
 	lua_pcall(L, 0, 0, 0);
+	ReadAllData();
 }
 
 void LuaWrapper::WriteAllData()
@@ -86,5 +88,45 @@ void LuaWrapper::WriteData(WrapperData * variable)
 
 	}
 	lua_setglobal(L, variable->name);
+}
+
+void LuaWrapper::ReadAllData()
+{
+	for(unsigned int i = 0; i < data.size(); i++)
+	{
+		WrapperData * variable = data[i];
+		if(!variable->input)
+		{
+			ReadData(variable);
+		}
+
+
+	}
+}
+
+void LuaWrapper::ReadData(WrapperData * variable)
+{
+	lua_getglobal(L, variable->name);
+	switch(variable->type)
+	{
+	case Lua_TypeInt:
+		*((int *)variable->WrapperValue) = lua_tointeger(L, -1);
+		break;
+
+	case Lua_TypeFloat:
+		*((float *)variable->WrapperValue) = lua_tonumber(L, -1);
+		break;
+
+	case Lua_TypeBool:
+		*((bool *)variable->WrapperValue) = lua_toboolean(L, -1);
+		break;
+
+	case Lua_TypeString:
+		// Woops, can't write in const char * :/
+
+		break;
+
+	}
+
 }
 

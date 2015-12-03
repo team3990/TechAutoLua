@@ -6,16 +6,21 @@
 
 int main(void) {
 	LuaWrapper * wrapper = new LuaWrapper;
+
+	// Comme on est dans l'exponentiel en maths...
 	int base = 4;
 	int exposant = 0;
+	int puissance = 0;
 
 	wrapper->PushData(Lua_TypeInt, "base", (void*)&base, true);
 	wrapper->PushData(Lua_TypeInt, "exposant", (void*)&exposant, true);
+	wrapper->PushData(Lua_TypeInt, "puissance", (void*)&puissance, false); // Output
 
 	for(int i = 0; i < 15; i++)
 	{
 		exposant = i;
 		wrapper->Update();
+		printf("%d\n", puissance);
 	}
 
 	return 0;
