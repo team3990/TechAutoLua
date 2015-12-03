@@ -31,13 +31,13 @@ LuaWrapper::~LuaWrapper()
 	delete L;
 }
 
-void LuaWrapper::PushData(char type, const char* name, void* value, bool input)
+void LuaWrapper::PushData(char type, const char* name, void* value, bool output)
 {
 	WrapperData * wrapper = new WrapperData;
 	wrapper->type         = type;
 	wrapper->name         = name;
 	wrapper->WrapperValue = value;
-	wrapper->input        = input;
+	wrapper->output       = input;
 	data.push_back(wrapper);
 
 
@@ -55,13 +55,7 @@ void LuaWrapper::WriteAllData()
 {
 	for(unsigned int i = 0; i < data.size(); i++)
 	{
-		WrapperData * variable = data[i];
-		if(variable->input)
-		{
-			WriteData(variable);
-		}
-
-
+		WriteData(data[i]);
 	}
 }
 
@@ -83,7 +77,7 @@ void LuaWrapper::WriteData(WrapperData * variable)
 		break;
 
 	case Lua_TypeString:
-		lua_pushstring(L, (const char *)variable->WrapperValue);
+		lua_pushstring(L, *((const char **)variable->WrapperValue));
 		break;
 
 	}
@@ -95,7 +89,7 @@ void LuaWrapper::ReadAllData()
 	for(unsigned int i = 0; i < data.size(); i++)
 	{
 		WrapperData * variable = data[i];
-		if(!variable->input)
+		if(variable->output)
 		{
 			ReadData(variable);
 		}

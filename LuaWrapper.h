@@ -20,7 +20,7 @@ struct WrapperData
 	char type; // Look below
 	const char* name; // Name of the variable in lua
 	void * WrapperValue;
-	bool input; // In or out
+	bool output; // In or out
 };
 
 
