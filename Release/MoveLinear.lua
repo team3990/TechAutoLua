@@ -30,6 +30,7 @@ function module.body()
 		end
 	
 	end
+	print("Distance parcourue: "..distance);
 
 end
 

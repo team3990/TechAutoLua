@@ -19,35 +19,6 @@ struct timeval time2;
 int main(void) {
 	LuaWrapper * wrapper = new LuaWrapper;
 
-	/*
-	// Comme on est dans l'exponentiel en maths...
-	int base = 4;
-	int exposant = 0;
-	int puissance = 0;
-
-	bool foo = true;
-
-
-	wrapper->PushData(Lua_TypeInt, "base", (void*)&base, false);
-	wrapper->PushData(Lua_TypeInt, "exposant", (void*)&exposant, false);
-	wrapper->PushData(Lua_TypeBool, "nombre", (void*)&foo, true);
-
-
-	wrapper->PushData(Lua_TypeInt, "puissance", (void*)&puissance, true); // Output
-
-
-	for(int i = 0; i < 15; i++)
-	{
-
-		exposant = i;
-		wrapper->Update();
-		printf("%d\n", puissance);
-		printf(foo ? "true\n" : "false\n");
-	}
-
-	return 0;
-	*/
-
 	float MoteurVitesse = 0;
 	float MoteurRotation = 0;
 	float MoteurBras   = 0;
@@ -56,26 +27,27 @@ int main(void) {
 	bool RamasseurSwitch  = false;
 	bool EstFini          = false;
 	float distance = 2423444; // Bidon
+	int counter = 0; // Conteur de loops
 	//std::cin >> distance;
 
 	const float DistanceParBoucle = 0.75; // En centimètres ...
 
+	gettimeofday(&time1, NULL);
 	wrapper->PushData(Lua_TypeFloat, "MoteurVitesse",         (void*)&MoteurVitesse, true);     // Lua -> MoteurVitesse
 	wrapper->PushData(Lua_TypeFloat, "MoteurRotation",        (void*)&MoteurRotation, true);    // Lua -> MoteurVitesse
 	wrapper->PushData(Lua_TypeFloat, "MoteurBras",            (void*)&MoteurBras, true);        // Lua->MoteurBras
 	wrapper->PushData(Lua_TypeFloat, "MoteurRamasseur",       (void*)&MoteurRamasseur, true);   // Lua->MoteurRamasseur
-	wrapper->PushData(Lua_TypeBool , "RamasseurSwitch",       (void*)&RamasseurSwitch, false);  // RamasseurSwitch -> Lua
+	wrapper->PushData(Lua_TypeBool,  "RamasseurSwitch",       (void*)&RamasseurSwitch, false);  // RamasseurSwitch -> Lua
 	wrapper->PushData(Lua_TypeFloat, "distance",              (void*)&distance, false);
+	wrapper->PushData(Lua_TypeInt  , "autocounter",           (void*)&counter, false);
 	wrapper->PushData(Lua_TypeBool,  "EstFini",               (void*)&EstFini, true);         // Distance -> Lua
 
 
-	gettimeofday(&time1, NULL);
-	int counter = 0;
+
 	while(1)
 	{
 		counter++;
 
-		//timestamp1 = time1.tv_usec;
 		distance += DistanceParBoucle * MoteurVitesse;
 		wrapper->Update();
 
@@ -84,6 +56,7 @@ int main(void) {
 		{
 			int val = (*actions)[i];
 
+			// La switch ne voulait pas marcher.
 			if(val == LUAFlag_ResetEncoder)
 			{
 				distance = 0;
@@ -97,7 +70,8 @@ int main(void) {
 
 		}
 
-		*actions = std::vector<int>(); // New one pls
+		(*actions).clear(); // Vider le vecteur, maintenant que toutes les actions ont été exécutées
+
 
 
 		if(EstFini)
@@ -105,6 +79,7 @@ int main(void) {
 			printf("\n%f\n", distance);
 			break;
 		}
+		usleep(10000); // 10 millis
 
 	}
 
