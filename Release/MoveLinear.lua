@@ -1,11 +1,14 @@
 local module = {}
 
+m.name = "Faire bouger le ballon avec des encodeurs"
 local distancecible = 0
 
 function module.init(ArgTable)
 		print(ArgTable[1])
-		if ResetEncoder == nil then print "gooby pls"
-		else ResetEncoder()
+		if ResetEncoder then 
+			ResetEncoder()
+		else 
+			print "gooby pls" -- ResetEncoder n'est pas défini. Quelqu'un exécute probablement ce programme avec le programme générique.
 	
 		end
 		
@@ -39,6 +42,7 @@ function module.isdone()
 		local cond = (math.abs(distance - distancecible) < 0.20)
 		if(cond) then
 			MoteurVitesse = 0;
+			print "Cible d'encodeurs atteinte."
 		
 		end
 			
