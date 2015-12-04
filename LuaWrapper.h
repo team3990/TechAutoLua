@@ -14,6 +14,10 @@
 #include <lua.h>
 #include <lauxlib.h>
 #include <lualib.h>
+#include <iostream>
+
+
+
 
 struct WrapperData
 {
@@ -30,20 +34,35 @@ const char Lua_TypeBool   = 2;
 const char Lua_TypeString = 3;
 
 
+const int LUAFlag_ResetGyro = 0;
+const int LUAFlag_ResetEncoder = 1;
+
+
+
+
 class LuaWrapper {
 public:
 	LuaWrapper();
 	virtual ~LuaWrapper();
 	void Update();
 	void PushData(char, const char*, void*, bool);
+	void PushVariable(const char * name, const char* value); // Strings
+	void PushVariable(const char * name, int value); // Ints
+	void PushVariable(const char * name, float value); // Floats
+	void PushVariable(const char * name, bool value); // Bools
+	std::vector<int> * GetActions();
+
+
+
 
 
 private:
 	lua_State * L;
 	void WriteAllData();
-	void WriteData(WrapperData*);
 	void ReadAllData();
-	void ReadData(WrapperData*);
+	void WriteData(const char*, void*, char);
+	void ReadData(const char*, void*, char);
+
 
 	std::vector<WrapperData*> data;
 

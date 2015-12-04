@@ -2,9 +2,18 @@
 #include <lauxlib.h>                            /* Always include this when calling Lua */
 #include <lualib.h>                             /* Always include this when calling Lua */
 #include <stdlib.h>
+#include "stdio.h"
 #include "luawrapper.h"
 #include <stdio.h>
+#include "unistd.h"
 #include "iostream"
+#include <stdio.h>
+#include <unistd.h>
+
+#include "sys/time.h"
+
+struct timeval time1;
+struct timeval time2;
 
 
 int main(void) {
@@ -40,28 +49,67 @@ int main(void) {
 	*/
 
 	float MoteurVitesse = 0;
-	float distance = 0;
+	float MoteurRotation = 0;
+	float MoteurBras   = 0;
+	float MoteurRamasseur   = 0;
+
+	bool RamasseurSwitch  = false;
+	bool EstFini          = false;
+	float distance = 2423444; // Bidon
+	//std::cin >> distance;
 
 	const float DistanceParBoucle = 0.5; // En centimètres ...
 
-	wrapper->PushData(Lua_TypeFloat, "MoteurVitesse", (void*)&MoteurVitesse, true);
-	wrapper->PushData(Lua_TypeFloat, "distance",      (void*)&distance, false);
+	wrapper->PushData(Lua_TypeFloat, "MoteurVitesse",         (void*)&MoteurVitesse, true);     // Lua -> MoteurVitesse
+	wrapper->PushData(Lua_TypeFloat, "MoteurRotation",        (void*)&MoteurRotation, true);    // Lua -> MoteurVitesse
+	wrapper->PushData(Lua_TypeFloat, "MoteurBras",            (void*)&MoteurBras, true);        // Lua->MoteurBras
+	wrapper->PushData(Lua_TypeFloat, "MoteurRamasseur",       (void*)&MoteurRamasseur, true);   // Lua->MoteurRamasseur
+	wrapper->PushData(Lua_TypeBool , "RamasseurSwitch",       (void*)&RamasseurSwitch, false);  // RamasseurSwitch -> Lua
+	wrapper->PushData(Lua_TypeFloat, "distance",              (void*)&distance, false);
+	wrapper->PushData(Lua_TypeBool,  "EstFini",               (void*)&EstFini, true);         // Distance -> Lua
 
+
+	gettimeofday(&time1, NULL);
+	int counter = 0;
 	while(1)
 	{
+		counter++;
 
-		printf("MoteurVitesse: %f\n", MoteurVitesse);
-		printf("Distance parcourue: %f\n", distance);
+		//timestamp1 = time1.tv_usec;
 		distance += DistanceParBoucle * MoteurVitesse;
 		wrapper->Update();
-		if(MoteurVitesse == 0)
+
+		std::vector<int> * actions = wrapper->GetActions();
+		for(unsigned int i = 0; i < (*actions).size(); i++)
 		{
-			printf("MoteurVitesse: %f\n", MoteurVitesse);
-			printf("Distance parcourue: %f\n", distance);
+			int val = (*actions)[i];
+			printf("%d", val);
+
+			if(val == LUAFlag_ResetEncoder)
+			{
+				distance = 0;
+				printf("\nL'encodeur est reinitialise :)\n");
+			}
+
+			else if (val == LUAFlag_ResetGyro)
+			{
+				printf("\nLe gyro est reinitialise :)\n");
+			}
+
+		}
+
+		*actions = std::vector<int>(); // New one pls
+
+
+		if(EstFini)
+		{
+			printf("\n%f\n", distance);
 			break;
 		}
 
-
-
 	}
+
+	gettimeofday(&time2, NULL);
+	std::cout << std::endl << ((double)(time2.tv_usec + time2.tv_sec * 100000 - time1.tv_sec * 100000 - time1.tv_usec)) / counter;
+
 }
