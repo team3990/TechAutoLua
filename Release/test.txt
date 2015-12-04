@@ -1,3 +1,4 @@
+MoveBras 50 true
+Ramasseur true
 MoveLinear 55
-MoveLinear -55
-MoveBras 42
+Ramasseur false

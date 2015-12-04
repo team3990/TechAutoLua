@@ -2,13 +2,14 @@
 #include <lauxlib.h>                            /* Always include this when calling Lua */
 #include <lualib.h>                             /* Always include this when calling Lua */
 #include <stdlib.h>
-#include "stdio.h"
+
 #include "luawrapper.h"
 #include <stdio.h>
 #include "unistd.h"
 #include "iostream"
-#include <stdio.h>
-#include <unistd.h>
+#include <cstdlib>
+
+
 
 #include "sys/time.h"
 
@@ -26,8 +27,9 @@ int main(void) {
 
 	bool RamasseurSwitch  = false;
 	bool EstFini          = false;
+	float SwitchBidon     = 0;
 	float distance = 2423444; // Bidon
-	int counter = 0; // Conteur de loops
+	int counter = 0; // Compteur de loops
 	//std::cin >> distance;
 
 	const float DistanceParBoucle = 0.75; // En centimètres ...
@@ -49,6 +51,23 @@ int main(void) {
 		counter++;
 
 		distance += DistanceParBoucle * MoteurVitesse;
+
+		SwitchBidon += MoteurRamasseur;
+
+		if(SwitchBidon > (4.2 + rand() % 5))
+		{
+			// Prétendons que le ballon est à l'intérieur
+
+			SwitchBidon = 0;
+			RamasseurSwitch = true;
+		}
+
+		if(MoteurRamasseur < 0)
+		{
+			SwitchBidon = 0;
+			RamasseurSwitch = false;
+		}
+
 		wrapper->Update();
 
 		std::vector<int> * actions = wrapper->GetActions();
@@ -79,7 +98,7 @@ int main(void) {
 			printf("\n%f\n", distance);
 			break;
 		}
-		usleep(10000); // 10 millis
+		usleep(30000);
 
 	}
 

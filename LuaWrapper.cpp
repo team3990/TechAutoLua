@@ -10,10 +10,14 @@
 
 std::vector<int> actions = std::vector<int>();
 
+
+
 void Lua_PushAction(int flag)
 {
-	actions.push_back(flag); // Actions exécutée par le programme C++ (ResetEncoder, ResetGyro, etc. )
+	actions.push_back(flag); // Actions exécutées par le programme C++ (ResetEncoder, ResetGyro, etc. )
 }
+
+// Commandes passees directement a lua (d'ou le static)
 
 static int Lua_ResetGyro(lua_State * L)
 {
@@ -182,7 +186,7 @@ void LuaWrapper::ReadData(const char * name, void * value, char type)
 		break;
 
 	case Lua_TypeString:
-		// Woops, can't write in const char * :/
+		// No const char * values please
 
 		break;
 
