@@ -1,11 +1,11 @@
-MoveLinear = require "MoveLinear"
-if(MoveLinear == nil) then print("yo"); a = 1/0; end
+LoadTxt    = require "LoadTxt"
+currentmodule = nil
+index = 0
 
 
-MoveLinear.IsInit = false
-MoveLinear.IsDone = false
 
-print("foo")
+
+
 MoteurVitesse    = 0.0
 MoteurRotation   = 0.0
 MoteurBras       = 0.0
@@ -16,31 +16,63 @@ distance         = 0.0
 RamasseurSwitch  = false
 EstFini          = false
 
+Actions = {}
+
+function ReadActions()
+
+	local file = io.open("Test.txt", "r")
+	while 1 do
+		local str = file:read("*line")
+		if str == nil then break end
+
+		Actions[#Actions+1] = LoadTxt.parse(str);
+	end
+		
+end
+
+function InitModule(action)
+	Argtable = {}
+	for i = 2, #action do Argtable[#Argtable + 1] = action[i] end
+	currentmodule = dofile ((action[1])..".lua")
+	currentmodule.init(Argtable)
+	
+end
+
+
+
 function update()
 	--print("In update")
 
-	if(MoveLinear.IsDone == true) then return end -- C'EST FINI :CCCCccccc
-	
-	if(MoveLinear.IsInit == false) then
-		ArgTable = {} 
-		ArgTable[0] = 50.00
+	if(currentmodule == nil) then
+		index = index + 1
+		action = Actions[index]
+		if action == nil then
+			EstFini = true
+			return
+		end
 		
-		MoveLinear.init(ArgTable)
-		MoveLinear.IsInit = true
-		return
-	end
+		InitModule(action)
+		
 	
-	if(MoveLinear.isdone()) then 
-		MoveLinear.IsDone = true
-		EstFini           = true
-		return
+	elseif (currentmodule.isdone() == true) then
+		currentmodule = nil -- bye-bye module
+		
+	else
+		currentmodule.body()
+		print("Vitesse du moteur: "..MoteurVitesse);
+		print("Distance parcourue: "..distance);
+		print(string.rep("_", 35))
+		
 	end
-	
-	MoveLinear.body();
-	print("Vitesse du moteur: "..MoteurVitesse);
-	print("Distance parcourue: "..distance);
-	print("Distance a parcourir: "..distancecible);
-	print(string.rep("_", 35))
+		
+		
+
 		
 
 end
+
+ReadActions()
+
+
+update()
+update()

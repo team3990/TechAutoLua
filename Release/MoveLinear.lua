@@ -9,7 +9,7 @@ function module.init(ArgTable)
 	
 		end
 		
-		distancecible = ArgTable[0]
+		distancecible = ArgTable[1]
 		
 end
 
