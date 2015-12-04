@@ -3,7 +3,7 @@ local module = {}
 local distancecible = 0
 
 function module.init(ArgTable)
-		print(ArgTable[0])
+		print(ArgTable[1])
 		if ResetEncoder == nil then print "gooby pls"
 		else ResetEncoder()
 	
@@ -34,8 +34,17 @@ function module.body()
 end
 
 function module.isdone()
-		return(math.abs(distance-distancecible) < 0.20)
+		
+		local cond = (math.abs(distance - distancecible) < 0.20)
+		if(cond) then
+			MoteurVitesse = 0;
+		
+		end
+			
+		return cond
 	
 end
+
+
 
 return module

@@ -2,10 +2,6 @@ LoadTxt    = require "LoadTxt"
 currentmodule = nil
 index = 0
 
-
-
-
-
 MoteurVitesse    = 0.0
 MoteurRotation   = 0.0
 MoteurBras       = 0.0
@@ -54,14 +50,12 @@ function update()
 		InitModule(action)
 		
 	
-	elseif (currentmodule.isdone() == true) then
-		currentmodule = nil -- bye-bye module
+	elseif (currentmodule.isdone()) then
+		currentmodule = nil -- Supprime le module de la vie.
 		
 	else
 		currentmodule.body()
-		print("Vitesse du moteur: "..MoteurVitesse);
 		print("Distance parcourue: "..distance);
-		print(string.rep("_", 35))
 		
 	end
 		

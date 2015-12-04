@@ -25,7 +25,7 @@ function m.parse(line)
 		elseif str == "false" then
 			value = false
 		
-		elseif string.find(str, "[^%d|.]") == nil then
+		elseif string.find(str, "[^%d|.|-]") == nil then
 			value = tonumber(str)
 		
 		end

@@ -58,7 +58,7 @@ int main(void) {
 	float distance = 2423444; // Bidon
 	//std::cin >> distance;
 
-	const float DistanceParBoucle = 0.5; // En centimètres ...
+	const float DistanceParBoucle = 0.75; // En centimètres ...
 
 	wrapper->PushData(Lua_TypeFloat, "MoteurVitesse",         (void*)&MoteurVitesse, true);     // Lua -> MoteurVitesse
 	wrapper->PushData(Lua_TypeFloat, "MoteurRotation",        (void*)&MoteurRotation, true);    // Lua -> MoteurVitesse
@@ -83,7 +83,6 @@ int main(void) {
 		for(unsigned int i = 0; i < (*actions).size(); i++)
 		{
 			int val = (*actions)[i];
-			printf("%d", val);
 
 			if(val == LUAFlag_ResetEncoder)
 			{

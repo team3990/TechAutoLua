@@ -42,11 +42,11 @@ LuaWrapper::LuaWrapper()
 	luaL_openlibs(L);
 	luaL_loadfile(L, "AutoFrame.lua"); // Load file
 
-	//lua_pushcfunction(L, Lua_ResetEncoder);
-	//lua_setglobal(L, "ResetEncoder");
+	lua_pushcfunction(L, Lua_ResetEncoder);
+	lua_setglobal(L, "ResetEncoder");
 
-	//lua_pushcfunction(L, Lua_ResetGyro);
-	//lua_setglobal(L, "ResetGyro");
+	lua_pushcfunction(L, Lua_ResetGyro);
+	lua_setglobal(L, "ResetGyro");
 
 
 	lua_pcall(L, 0, 0, 0);            // Priming run: Exec script, but keep variables
