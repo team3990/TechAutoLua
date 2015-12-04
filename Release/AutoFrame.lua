@@ -22,7 +22,8 @@ function update()
 	if(MoveLinear.IsDone == true) then return end -- C'EST FINI :CCCCccccc
 	
 	if(MoveLinear.IsInit == false) then
-		ArgTable = {50.00} 
+		ArgTable = {} 
+		ArgTable[0] = 50.00
 		
 		MoveLinear.init(ArgTable)
 		MoveLinear.IsInit = true

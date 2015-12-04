@@ -1,9 +1,9 @@
 local module = {}
 
-distancecible = 0
+local distancecible = 0
 
 function module.init(ArgTable)
-
+		print(ArgTable[0])
 		if ResetEncoder == nil then print "gooby pls"
 		else ResetEncoder()
 	
