@@ -1,4 +1,5 @@
 LoadTxt    = require "LoadTxt"
+
 currentmodule = nil
 paralleltasks = {}
 
@@ -38,7 +39,6 @@ function RemoveName(modulename)
 end
 
 function ReadActions()
-
 	local file = io.open("test.txt", "r")
 	actiontable = {}
 	while 1 do
@@ -55,7 +55,24 @@ function ReadActions()
 				actiontable[#actiontable + 1] = LoadTxt.parse(string.sub(str, 2, -1))
 
 			end
+		
+		elseif (str:sub(1, 1) == "&") then
+			_index = 1
+			moduletable = {"Multitask"}
+			subaction = ""
+			str = str:sub(2)
+			while 1 do
+				_, _index, subaction = string.find(str, "(%([^%)]+%))")
+				if(not subaction) then break end
+				str = str:sub(_index)
+				moduletable[#moduletable + 1] = subaction:sub(2, -2)
+
+			end
+			if(#actiontable > 0) then Actions[#Actions + 1] = actiontable; actiontable = {} end
+			actiontable[1] = moduletable
+
 			
+		
 
 		else 
 			if(#actiontable > 0) then Actions[#Actions + 1] = actiontable; actiontable = {} end
@@ -63,12 +80,17 @@ function ReadActions()
 			actiontable[1] = LoadTxt.parse(str);
 		
 		end
+		
 	end
+	if(#actiontable > 0) then Actions[#Actions + 1] = actiontable; actiontable = {} end
 		
 end
 
+
+
 function InitModule(action)
 	if(not IsUsed(action[1])) then
+		print("INIT: "..action[1])
 		usedmodules[#usedmodules + 1] = action[1]
 		Argtable = {}
 		for i = 2, #action do 
@@ -78,6 +100,7 @@ function InitModule(action)
 		local newmodule = dofile ((action[1])..".lua")
 
 		newmodule.init(Argtable)
+		newmodule.rawname = action[1]
 		return newmodule
 	
 	end
@@ -91,8 +114,8 @@ end
 
 
 function update()
-	
 	if(currentmodule == nil) then
+		print(index)
 		index = index + 1
 		actiontable = Actions[index]
 
@@ -128,7 +151,7 @@ function update()
 		
 	
 	elseif (currentmodule.isdone()) then
-	
+		RemoveName(currentmodule.rawname)
 		currentmodule = nil -- Supprime le module de la vie.
 		
 		
@@ -138,10 +161,18 @@ function update()
 		
 	end
 	
-	for i = #paralleltasks, 1 do
+	for i = #paralleltasks, 1, -1 do
 		local parallelmodule = paralleltasks[i]
-		if(parallelmodule.isdone()) then paralleltasks[i] = nil end
-		parallelmodule.body()
+		print(parallelmodule)
+		--print("NOM: "..parallelmodule.name)
+		if(parallelmodule.isdone()) then 
+			paralleltasks[i] = nil; 
+			print("Module name: "..parallelmodule.rawname)
+			RemoveName(parallelmodule.rawname);
+		else 
+	
+			parallelmodule.body()
+		end
 	end
 	
 		

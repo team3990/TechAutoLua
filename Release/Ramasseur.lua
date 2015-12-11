@@ -1,5 +1,5 @@
 m = {}
-m.name = ""
+m.name = "moo foo"
 
 direction = true -- In. Out = false
 startloop      = 0
@@ -12,6 +12,7 @@ function m.init(_direction)
 end
 
 function m.body()
+	print("IN RAMASSEUR BODY :DD")
 	if(direction) then 
 		MoteurRamasseur = 0.5
 		
@@ -24,7 +25,7 @@ end
 
 
 function m.isdone()
-	cond = ((direction and RamasseurSwitch) or (not direction and (autocounter - startloop) > 10))
+	cond = ((direction and RamasseurSwitch) or (not direction and (autocounter - startloop) > 30))
 	if cond then 
 		MoteurRamasseur = 0 
 		if(RamasseurSwitch) then 
