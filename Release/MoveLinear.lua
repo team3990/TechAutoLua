@@ -3,6 +3,7 @@ local module = {}
 m.name = "Faire bouger le ballon avec des encodeurs"
 local distancecible = 0
 
+
 function module.init(ArgTable)
 		print(ArgTable[1])
 		if ResetEncoder then 
@@ -37,18 +38,17 @@ function module.body()
 
 end
 
-function module.isdone()
+module.isdone = {math.abs(distance - distancecible) < 0.20}
+function module.whendone()
 		
-		local cond = (math.abs(distance - distancecible) < 0.20)
-		if(cond) then
-			MoteurVitesse = 0;
-			print "Cible d'encodeurs atteinte."
+		MoteurVitesse = 0;
+		print "Cible d'encodeurs atteinte."
 		
-		end
-			
-		return cond
+
 	
 end
+
+
 
 
 
