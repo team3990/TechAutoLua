@@ -23,6 +23,7 @@ function ReadActions()
 		if str == nil then break end
 
 		Actions[#Actions+1] = LoadTxt.parse(str);
+		print(str)
 	end
 		
 end

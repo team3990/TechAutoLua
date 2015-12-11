@@ -42,18 +42,8 @@ LuaWrapper::LuaWrapper()
 	// Creating the object, opening the libs, loading the file, making a priming run.
 	L = luaL_newstate();
 
+	LoadFile("AutoFrame.lua");
 
-	luaL_openlibs(L);
-	luaL_loadfile(L, "AutoFrame.lua"); // Load file
-
-	lua_pushcfunction(L, Lua_ResetEncoder);
-	lua_setglobal(L, "ResetEncoder");
-
-	lua_pushcfunction(L, Lua_ResetGyro);
-	lua_setglobal(L, "ResetGyro");
-
-
-	lua_pcall(L, 0, 0, 0);            // Priming run: Exec script, but keep variables
 
 
 
@@ -68,6 +58,22 @@ LuaWrapper::~LuaWrapper()
 	delete L;
 }
 
+void LuaWrapper::LoadFile(const char * file)
+{
+	lua_settop(L, 0); // Clear the stack
+	luaL_openlibs(L); // Load libs
+	luaL_loadfile(L, file); // Load file
+
+	lua_pushcfunction(L, Lua_ResetEncoder);
+	lua_setglobal(L, "ResetEncoder"); // Set function
+
+	lua_pushcfunction(L, Lua_ResetGyro);
+	lua_setglobal(L, "ResetGyro"); // Set function
+
+
+	lua_pcall(L, 0, 0, 0);            // Priming run: Exec script, but keep variables
+
+}
 void LuaWrapper::PushData(char type, const char* name, void* value, bool output)
 {
 	WrapperData * wrapper = new WrapperData;

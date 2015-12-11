@@ -9,8 +9,6 @@
 #include "iostream"
 #include <cstdlib>
 
-
-
 #include "sys/time.h"
 
 struct timeval time1;
@@ -43,8 +41,6 @@ int main(void) {
 	wrapper->PushData(Lua_TypeFloat, "distance",              (void*)&distance, false);
 	wrapper->PushData(Lua_TypeInt  , "autocounter",           (void*)&counter, false);
 	wrapper->PushData(Lua_TypeBool,  "EstFini",               (void*)&EstFini, true);         // Distance -> Lua
-
-
 
 	while(1)
 	{

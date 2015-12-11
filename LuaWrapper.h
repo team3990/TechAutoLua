@@ -44,6 +44,8 @@ class LuaWrapper {
 public:
 	LuaWrapper();
 	virtual ~LuaWrapper();
+
+	void LoadFile(const char * file);
 	void Update();
 	void PushData(char, const char*, void*, bool);
 	void PushVariable(const char * name, const char* value); // Strings
