@@ -13,11 +13,9 @@ end
 
 function m.body()
 	print("IN RAMASSEUR BODY :DD")
-	if(direction) then 
-		MoteurRamasseur = 0.5
-		
-	else
-		MoteurRamasseur = -0.5
+	MoteurRamasseur = config.OUT_RamasseurSpeed
+	if(not direction) then
+		MoteurRamasseur = -MoteurRamasseur
 	
 	end
 	
@@ -25,7 +23,7 @@ end
 
 
 function m.isdone()
-	cond = ((direction and RamasseurSwitch) or (not direction and (autocounter - startloop) > 30))
+	cond = ((direction and RamasseurSwitch) or (not direction and (autocounter - startloop) > config.VAL_RamasseurLoops))
 	if cond then 
 		MoteurRamasseur = 0 
 		if(RamasseurSwitch) then 

@@ -1,4 +1,5 @@
 LoadTxt    = require "LoadTxt"
+config     = require "config"
 
 currentmodule = nil
 paralleltasks = {}
@@ -39,7 +40,7 @@ function RemoveName(modulename)
 end
 
 function ReadActions()
-	local file = io.open("test.txt", "r")
+	local file = io.open(config.F_instrucfile, "r")
 	actiontable = {}
 	while 1 do
 		local str = file:read("*line")
@@ -48,21 +49,20 @@ function ReadActions()
 			break 
 		
 		
-		elseif (str:sub(1, 1) == "*") then
+		elseif (str:sub(1, 1) == config.STR_ParallelToken) then
 			-- Parallel
 			if #actiontable > 0 then 
-				print("yay")
 				actiontable[#actiontable + 1] = LoadTxt.parse(string.sub(str, 2, -1))
 
 			end
 		
-		elseif (str:sub(1, 1) == "&") then
+		elseif (str:sub(1, 1) == config.STR_MultitaskToken) then
 			_index = 1
 			moduletable = {"Multitask"}
 			subaction = ""
 			str = str:sub(2)
 			while 1 do
-				_, _index, subaction = string.find(str, "(%([^%)]+%))")
+				_, _index, subaction = string.find(str, config.STR_ActionRegex)
 				if(not subaction) then break end
 				str = str:sub(_index)
 				moduletable[#moduletable + 1] = subaction:sub(2, -2)
@@ -97,7 +97,7 @@ function InitModule(action)
 			Argtable[#Argtable + 1] = action[i]
 
 		end
-		local newmodule = dofile ((action[1])..".lua")
+		local newmodule = dofile (string.format(config.F_moduleformat, action[1]))
 
 		newmodule.init(Argtable)
 		newmodule.rawname = action[1]
@@ -135,6 +135,7 @@ function update()
 		if(currentmodule.name ~= nil) then
 			print("Nom de l'action: "..currentmodule.name)
 		end
+		
 		for i = 2, #actiontable do
 			paralleltasks[#paralleltasks+1] = InitModule(actiontable[i])
 			

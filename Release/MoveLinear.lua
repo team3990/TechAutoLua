@@ -1,4 +1,6 @@
+require "config"
 local m = {}
+
 
 m.name = "Faire bouger le ballon avec des encodeurs"
 local distancecible = 0
@@ -18,29 +20,23 @@ function m.init(ArgTable)
 end
 
 function m.body()
-	if(distance > distancecible) then
-		if ((distance - distancecible) < 20) then
-				MoteurVitesse = -0.5;
-		else
-				MoteurVitesse = -1
-		end
-	
-	elseif (distance < distancecible) then
-		if ((distancecible - distance) < 20) then
-				MoteurVitesse = 0.5;
-		else	
-			MoteurVitesse = 1;
-	
-		end
+	MoteurVitesse = config.OUT_BaseDefaultSpeed
+	if(math.abs(distance - distancecible) < config.VAL_BaseProxValue) then
+		MoteurVitesse = config.OUT_BaseProxSpeed
 	
 	end
+	
+	if(distance > distancecible) then
+		MoteurVitesse = -MoteurVitesse 
+	end
+
 
 end
 
 
 function m.isdone()
 		
-		local cond = math.abs(distance - distancecible) < 1
+		local cond = math.abs(distance - distancecible) < config.VAL_BaseStopValue
 		if cond then MoteurVitesse = 0 end
 		return cond
 		

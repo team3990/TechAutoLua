@@ -1,3 +1,4 @@
+require "config"
 m = {}
 
 m.name = "Bouger le bras"
@@ -12,23 +13,18 @@ function m.init(ArgTable)
 end
 
 function m.body()
-	if direction then 
-		MoteurBras = 0.5
-		print("Bras par en avant. ")
+	MoteurBras = config.OUT_MoveBrasSpeed
 	
-	else
-		MoteurBras = -0.5
-		print("Bras par en arriere. ")
+	if not direction then
+		MoteurBras = -MoteurBras
 	
 	end
-	print((autocounter - startcounter).." Tours")
 end
 
 function m.isdone()
 	cond = ((autocounter - startcounter) >= nbloops)
 	if(cond) then 
 		MoteurBras = 0
-		print "Bras rendu. En theorie. "
 			
 	end
 	return cond
