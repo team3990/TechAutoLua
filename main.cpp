@@ -8,12 +8,11 @@
 #include "unistd.h"
 #include "iostream"
 #include <cstdlib>
+#include "math.h"
 
 #include "sys/time.h"
 
 struct timeval time1;
-struct timeval time2;
-
 
 int main(void) {
 	LuaWrapper * wrapper = new LuaWrapper;
@@ -32,7 +31,6 @@ int main(void) {
 
 	const float DistanceParBoucle = 0.75; // En centimètres ...
 
-	gettimeofday(&time1, NULL);
 	wrapper->PushData(Lua_TypeFloat, "MoteurVitesse",         (void*)&MoteurVitesse, true);     // Lua -> MoteurVitesse
 	wrapper->PushData(Lua_TypeFloat, "MoteurRotation",        (void*)&MoteurRotation, true);    // Lua -> MoteurVitesse
 	wrapper->PushData(Lua_TypeFloat, "MoteurBras",            (void*)&MoteurBras, true);        // Lua->MoteurBras
@@ -44,6 +42,8 @@ int main(void) {
 
 	while(1)
 	{
+		time1 = (struct timeval){0};
+		gettimeofday(&time1, NULL);
 		counter++;
 
 		distance += DistanceParBoucle * MoteurVitesse;
@@ -91,14 +91,17 @@ int main(void) {
 
 		if(EstFini)
 		{
-			printf("\n%f\n", distance);
 			break;
 		}
-		usleep(30000);
+
+
+		printf("%ld %ld \n", time1.tv_sec, time1.tv_usec);
+
+
 
 	}
 
-	gettimeofday(&time2, NULL);
-	std::cout << std::endl << ((double)(time2.tv_usec + time2.tv_sec * 100000 - time1.tv_sec * 100000 - time1.tv_usec)) / counter;
+
+
 
 }

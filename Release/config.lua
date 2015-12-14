@@ -2,7 +2,7 @@ m = {}
 
 -- Files
 m.F_fileformat   = "%s.lua"
-m.F_moduleformat = "%s.lua"
+m.F_moduleformat = "Modules//%s.lua"
 m.F_instrucfile  = "test.txt"
 
 --Outputs
@@ -24,6 +24,8 @@ m.STR_CommentChar      = "#"
 
 --Flags
 m.FLAG_ResetEncoder    = 1
+
+--Arg templates
 
 
 return m

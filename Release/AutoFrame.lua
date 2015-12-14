@@ -1,5 +1,7 @@
-LoadTxt    = dofile "LoadTxt.lua"
-config     = dofile "config.lua"
+LoadTxt      = dofile "LoadTxt.lua"
+config       = dofile "config.lua"
+ModuleLoader = dofile "ModuleLoader.lua"
+
 
 currentmodule = nil
 paralleltasks = {}
@@ -38,6 +40,8 @@ function RemoveName(modulename)
 	end
 	
 end
+
+
 
 function ReadCommands()
 	local file = io.open(config.F_instrucfile, "r")
@@ -98,7 +102,8 @@ end
 
 
 function InitModule(command)
-	if(#command == 0) then return end
+	if(command == nil) then return end
+	if(#command == 0)  then return end
 	if(not IsUsed(command[1])) then -- if a module of the same name is still running, manually block it
 		print("INIT: "..command[1])
 		usedmodules[#usedmodules + 1] = command[1]
@@ -107,9 +112,28 @@ function InitModule(command)
 			Argtable[#Argtable + 1] = command[i]
 
 		end
+		print("CREATING")
 		local newmodule = dofile (string.format(config.F_moduleformat, command[1]))
+		print("CREATED")
+		
+		if(newmodule.ArgTemplates) then
+			if(not ModuleLoader.AnalyseArgs(Argtable, newmodule.ArgTemplates)) then
+					print("*** Bad arguments: skipping.")
+					return
+			end
+			
+		end
 
-		newmodule.init(Argtable)
+		success, result = pcall(function() newmodule.init(Argtable) end)
+		print("CALLD")
+		
+		if(not success) then
+			-- Oh dear
+
+			print("*** Sounds like the module is broke, skipping. ")
+			print(result) -- stderr
+			return 
+		end
 		newmodule.rawname = command[1]
 		return newmodule
 	
@@ -156,12 +180,8 @@ function update()
 			
 		end
 
-		
 	
-		
-	
-	elseif (currentmodule.isdone()) then
-		currentmodule.whendone()
+	elseif (ModuleLoader.CommandIsDone(currentmodule)) then
 		RemoveName(currentmodule.rawname)
 		currentmodule = nil -- Whack teh module!
 		update()
@@ -176,14 +196,13 @@ function update()
 	for i = #paralleltasks, 1, -1 do
 		local parallelmodule = paralleltasks[i]
 		--print("NOM: "..parallelmodule.name)
-		if(parallelmodule.isdone()) then 
-			paralleltasks[i].whendone()
-			paralleltasks[i] = nil; 
-			print("Module name: "..parallelmodule.rawname)
+		if(ModuleLoader.CommandIsDone(parallelmodule)) then 
 			RemoveName(parallelmodule.rawname);
+			paralleltasks[i] = nil; 
+			
 		else 
 	
-			parallelmodule.body()
+			ModuleLoader.CommandBody(parallelmodule)
 		end
 	end
 	
