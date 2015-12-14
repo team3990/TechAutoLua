@@ -68,6 +68,8 @@ function m.CommandIsDone(_module)
 end
 
 function m.CommandBody(_module)
+	if(_module == nil) then return end
+	--print("In body ".._module.rawname)
 	state, result = safecall(_module.body, string.format("Bork when calling body in module %s", _module.rawname))
 	if(not state) then _module.isdone = (function() return true end) end -- Let's end this
 end

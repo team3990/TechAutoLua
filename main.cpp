@@ -42,8 +42,6 @@ int main(void) {
 
 	while(1)
 	{
-		time1 = (struct timeval){0};
-		gettimeofday(&time1, NULL);
 		counter++;
 
 		distance += DistanceParBoucle * MoteurVitesse;
@@ -95,7 +93,6 @@ int main(void) {
 		}
 
 
-		printf("%ld %ld \n", time1.tv_sec, time1.tv_usec);
 
 
 

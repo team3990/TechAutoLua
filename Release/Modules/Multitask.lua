@@ -1,5 +1,6 @@
 m = {}
-require("LoadTxt")
+LoadTxt      = dofile "LoadTxt.lua"
+ModuleLoader = dofile "ModuleLoader.lua"
 
 m.name = "Multitask "
 
@@ -22,14 +23,13 @@ end
 
 function m.body()
 	for i = 1, #modules do
-		modules[i].body()
+		ModuleLoader.CommandBody(modules[i])
 	end
 end
 
 function m.isdone()
 	for i = #modules, 1, -1 do	
-		if modules[i].isdone() then
-			modules[i].whendone()
+		if ModuleLoader.CommandIsDone(modules[i]) then
 			RemoveName(modules[i].rawname)
 			modules[i] = nil -- Bye bye, once again
 		

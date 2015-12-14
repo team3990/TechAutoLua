@@ -1,7 +1,7 @@
-Ramasseur true
+Ramasseur false
 &(MoveBras 50 true)(Ramasseur false)
 *MoveLinear 20
-&(MoveLinear -20) (Ramasseur false)
-MoveLinear 20
-MoveLinear 40
-Ramasseur true
+#&(MoveLinear -20) (Ramasseur false)
+#MoveLinear 20
+#MoveLinear 40
+#Ramasseur true

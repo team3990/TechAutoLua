@@ -17,7 +17,6 @@ function m.body()
 	
 	if not direction then
 		MoteurBras = -MoteurBras
-	
 	end
 	
 end

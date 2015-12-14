@@ -25,7 +25,6 @@ m.STR_CommentChar      = "#"
 --Flags
 m.FLAG_ResetEncoder    = 1
 
---Arg templates
 
 
 return m

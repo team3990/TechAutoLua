@@ -21,7 +21,10 @@ autocounter      = 0
 RamasseurSwitch  = false
 EstFini          = false
 
-Commands = {}
+Commands = {} --tridimensional array
+-- Array of a list of action blocks
+-- Action blocks are list of commands.  First action is a linear command.  Other actions are parallel. 
+-- Actions are arrays with a module name parsed args.
 
 function IsUsed(modulename)
 
@@ -46,7 +49,6 @@ end
 function ReadCommands()
 	local file = io.open(config.F_instrucfile, "r")
 	commandtable = {}
-	linenumber = 1
 	while 1 do
 		local str = file:read("*line")
 		
@@ -55,45 +57,47 @@ function ReadCommands()
 		end
 		
 		str = string.gsub(str, config.STR_CommentChar..".*", "") -- Strip comment line
+		if str ~= "" then
 		
-		
-		if (str:sub(1, 1) == config.STR_ParallelToken) then
-			-- Parallel
-			if #commandtable > 0 then 
-				result = LoadTxt.parse(string.sub(str, 2, -1))
+			if (str:sub(1, 1) == config.STR_ParallelToken) then
+				-- Parallel
+				if #commandtable > 0 then 
+					result = LoadTxt.parse(string.sub(str, 2, -1))
+					commandtable[#commandtable + 1] = result
 
-			else
-				print("Can't run parallel commands like linear commands!")
-			end
-		
-		elseif (str:sub(1, 1) == config.STR_MultitaskToken) then
-			-- Create a multitask object and put stuff in it
-			_index = 1
-			moduletable = {"Multitask"} -- That's a module like any other
-			subcommand = ""
-			str = str:sub(2) -- Remove the token at the beginning
-			while 1 do
-				_, _index, subcommand = string.find(str, config.STR_CommandRegex) -- Find first occurence of (...)
-				if(not subcommand) then break end -- Stahpings
-				str = str:sub(_index)
-				moduletable[#moduletable + 1] = subcommand:sub(2, -2)
+				else
+					print("Can't run parallel commands like linear commands!")
+				end
+			
+			elseif (str:sub(1, 1) == config.STR_MultitaskToken) then
+				-- Create a multitask object and put stuff in it
+				_index = 1
+				moduletable = {"Multitask"} -- That's a module like any other
+				subcommand = ""
+				str = str:sub(2) -- Remove the token at the beginning
+				while 1 do
+					_, _index, subcommand = string.find(str, config.STR_CommandRegex) -- Find first occurence of (...)
+					if(not subcommand) then break end -- Stahpings
+					str = str:sub(_index)
+					moduletable[#moduletable + 1] = subcommand:sub(2, -2)
+					
+
+				end
+				if(#commandtable > 0) then Commands[#Commands + 1] = commandtable; commandtable = {} end
+				commandtable[1] = moduletable
+
 				
+			
 
+			else 
+				if(#commandtable > 0) then Commands[#Commands + 1] = commandtable; commandtable = {} end
+				commandtable[1] = LoadTxt.parse(str);
+				
+			
 			end
-			if(#commandtable > 0) then Commands[#Commands + 1] = commandtable; commandtable = {} end
-			commandtable[1] = moduletable
-
+			print("LEN: "..#Commands)
 			
-		
-
-		else 
-			if(#commandtable > 0) then Commands[#Commands + 1] = commandtable; commandtable = {} end
-			commandtable[1] = LoadTxt.parse(str);
-			
-		
 		end
-		print("LEN: "..#Commands)
-		
 	end
 	if(#commandtable > 0) then Commands[#Commands + 1] = commandtable; commandtable = {} end
 		
@@ -112,9 +116,10 @@ function InitModule(command)
 			Argtable[#Argtable + 1] = command[i]
 
 		end
-		print("CREATING")
+		
 		local newmodule = dofile (string.format(config.F_moduleformat, command[1]))
-		print("CREATED")
+
+		
 		
 		if(newmodule.ArgTemplates) then
 			if(not ModuleLoader.AnalyseArgs(Argtable, newmodule.ArgTemplates)) then
@@ -125,7 +130,7 @@ function InitModule(command)
 		end
 
 		success, result = pcall(function() newmodule.init(Argtable) end)
-		print("CALLD")
+
 		
 		if(not success) then
 			-- Oh dear
@@ -188,7 +193,7 @@ function update()
 		
 		
 	else
-		currentmodule.body()
+		ModuleLoader.CommandBody(currentmodule)
 		
 		
 	end

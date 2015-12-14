@@ -6,7 +6,7 @@ m.name = "Faire bouger le ballon avec des encodeurs"
 local distancecible = 0
 
 m.InitArgs = {
-
+	{type(float)}
 }
 
 
@@ -18,7 +18,6 @@ function m.init(ArgTable)
 			print "PushAction not found.  Please run me with the C++ program. "
 	
 		end
-		
 		distancecible = ArgTable[1]
 		
 end
