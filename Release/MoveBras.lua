@@ -19,6 +19,8 @@ function m.body()
 		MoteurBras = -MoteurBras
 	
 	end
+	
+	print("Exec MoveBras.body. ")
 end
 
 function m.isdone()

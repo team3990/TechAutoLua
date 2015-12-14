@@ -1,78 +1,59 @@
-Wrapper Lua, par Olivier Lalonde.
+Lua Wrapper for FRC robots, by Olivier Lalonde
 
-1) Pour ce qui est du (des) fichier(s) de commandes
-	test.txt.  Chaque commande prend une ligne, dans la syntaxe suivante:
-		->[module] [arguments]
-		
-	Pour l'instant, les arguments ne peuvent être que des nombres (entiers, floats, etc.) et des booléens, et ça devrait amplement suffire.
+This wrapper is designed to operate during the autonomous mode. Not only does it use an external command list (without having to recompile every time), but it 
+also use external auto command scripts (in lua). The C++ program inputs some variables (like EncoderDistance, autoloop, etc.), executes update() in AutoFrame lua,
+then outputs some variables (like DriveForward, DriveRotation, etc.) and uses them to drive the robot:
+
+	robot.cpp:
+	EncoderDistance = ReadEncoder();
+	// EncoderDistance -> lua
+
+	autoframe.lua:
+	function update()
+		if EncoderDistance < 30 then MotorDrive = 1 end -- Drive forward
+	end
 	
-	Les commandes sont exécutées dans l'ordre. 
-	Il existe également quelques hacks pour faire des choses plus compliquées.
-	1.1) Commandes parallèles
-		Syntaxe:
-			->*[module] [arguments]
-		Sont initialisées en même temps que la commande non parallèle la plus proche par en haut.  Donc:
+	robot.cpp:
+	// MotorDrive->cpp
+	Robot.Drive(MotorDrive);
+
+That's the basic functionality. As mentioned before, I also coded a module-oriented approach in lua that allows the user to write modules and a text file with
+a list of commands.  A module has three functions: init (that will be called with the provided arguments), body (that will be called every loop), and isdone, 
+that will be called every loop, and should return the command's state. Example:
+	-- Default module: foo.lua
+	m = {}
+	targetdistance = 0
+	function m.init(mytable)
+		targetdistance = mytable[0]
+	end
 	
-			foo 115
-			*foobar 22
-			*foobarbar 23
-			foo2 116
-			
-		Ici, foo sera exécuté.  foobar et foobarbar seront exécutés en même temps.  Quand foo sera fini, foo2 embarquera, même si foobar et foobarbar roulent toujours.
-		
-		Comme leur nom l'indique, une fois initialisées, les commandes parallèles sont entièrement indépendantes des commandes linéaires.  À la fin du fichier de commandes, 
-		si les actions linéaires sont terminées mais il reste des commandes parallèles, le programme se terminera. 
-		
-	1.2) Commandes concurrentes
-		Syntaxe:
-			->&([module] [arguments]) ([module2] [arguments2])
-		
-		Même principe que les commandes parallèles (module1 et module2 seront tous les deux exécutés), mais la commande est traitée comme linéaire. Donc:
-			&(foo 115) (foobar 666)
-			foo2 13
-		
-		foo et foobar seront exécutés simultanément, mais foo2 ne sera pas exécuté tant que les deux ne seront pas finis. 
-		
-	1.3) A ne pas faire
-		Mon parseur (qui est fait 100% maison) est quand même vraiment sketch.  Donc, choses à éviter:
-			foo 10 // 10 tours
-			*foobar 22 // 22 tours
-			foobar 23 // 23 tours
-			
-		Ici, le deuxième foobar sera appelé alors que le premier roule toujours.  Dans ce cas spécifique, il ignorerait le deuxième, mais si ce code
-		continuait avec une autre commande parallèle, cela déclencherait une apocalypse nucléaire.  
-		
-		De plus, il supporte très mal les commandes nestées.  Donc, pas de &(foo2)(&(foo3)(foo4)), ça détruirait tout.  
-		
-		Je crois qu'il est assez correct, mais quoi que ce soit de malhonnête risque de le briser assez sérieusement.
-		
-2) Écrire des commandes
-	Super simple.  Il faut d'abord créer un fichier lua, et faire la procédure habituelle: Déclarer une table, la retourner à la fin du fichier
-    (constituant le module). Tout ce qui doit être exporté doit être déclaré comme faisant partie de cette table. Exemple:
+	function m.body()
+		if targetdistance > EncoderDistance then MotorDrive = 1 end
+	end
 	
-	// foo.lua
-		local m = {}
-		m.patate = "Miam miam des patates"
-		return m
+	function m.isdone()
+		if(targetdistance == EncoderDistance) then
+			MotorDrive = 0
+			return true
+		end
+		return false
 		
-	// foo2.lua
-		require "foo"
-		print(foo.patate) // Miam miam des patates
-		
-	Les fonctions qui doivent être définies dans votre programme sont:
-		- init(Argtable) où Argtable est une table des arguments parsés.  Sera appelé une seule fois, après la création du module.
-		- body()         Appelé à chaque tour si isended() retourne false.
-		- IsDone()       Retourne bool. Si vrai, commande est considérée comme finie.
+	end	
+
+	return m
+	-- Command file: cmd.txt
+	foo 50
+	foo 30
 	
-	Les variables accessibles (celles qui seront créées, settées et lues par le programme C++) sont:
-		- MoteurVitesse   (float)
-		- MoteurRotation  (float)
-		- MoteurBras      (float)
-		- MoteurRamasseur (float)
-		- distance        (float)
-		- autocounter     (int)
-		- RamasseurSwitch (bool)
-		- EstFini         (bool)
+That code will drive the robot with a forward speed of 1 until the target of 50 is reached.  
+Then, it will again drive the robot with a forward speed of 1 until the target of 30 is reached. That program is of course extremely simplified, and it wouldn't
+work on a robot. Look at MoveLinear.lua for the real code.
 		
-		
-		
+HOW TO ADAPT THIS API TO YOUR OWN CODE:
+
+1) C++ side
+Include Luawrapper.cpp, luawrapper.h. Compile lua for the roboRIO with the toolchain, include liblua.a, include the h files.  Here's how you use the wrapper:
+- To load a file (such as AutoFrame.lua), use LuaWrapper::LoadFile. This function will clear the stack (thereby clearing the memory and the functions).
+- To update the file, use LuaWrapper::
+
+	

@@ -57,6 +57,7 @@ function ReadActions()
 			end
 		
 		elseif (str:sub(1, 1) == config.STR_MultitaskToken) then
+			-- Create a multitask object and put stuff in it
 			_index = 1
 			moduletable = {"Multitask"}
 			subaction = ""
@@ -66,6 +67,7 @@ function ReadActions()
 				if(not subaction) then break end
 				str = str:sub(_index)
 				moduletable[#moduletable + 1] = subaction:sub(2, -2)
+				
 
 			end
 			if(#actiontable > 0) then Actions[#Actions + 1] = actiontable; actiontable = {} end
@@ -76,7 +78,6 @@ function ReadActions()
 
 		else 
 			if(#actiontable > 0) then Actions[#Actions + 1] = actiontable; actiontable = {} end
-			print("len "..#actiontable)
 			actiontable[1] = LoadTxt.parse(str);
 		
 		end
@@ -115,7 +116,6 @@ end
 
 function update()
 	if(currentmodule == nil) then
-		print(index)
 		index = index + 1
 		actiontable = Actions[index]
 
@@ -154,6 +154,7 @@ function update()
 	elseif (currentmodule.isdone()) then
 		RemoveName(currentmodule.rawname)
 		currentmodule = nil -- Supprime le module de la vie.
+		update()
 		
 		
 	else
@@ -164,7 +165,6 @@ function update()
 	
 	for i = #paralleltasks, 1, -1 do
 		local parallelmodule = paralleltasks[i]
-		print(parallelmodule)
 		--print("NOM: "..parallelmodule.name)
 		if(parallelmodule.isdone()) then 
 			paralleltasks[i] = nil; 

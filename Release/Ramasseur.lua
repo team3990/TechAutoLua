@@ -12,12 +12,12 @@ function m.init(_direction)
 end
 
 function m.body()
-	print("IN RAMASSEUR BODY :DD")
 	MoteurRamasseur = config.OUT_RamasseurSpeed
 	if(not direction) then
 		MoteurRamasseur = -MoteurRamasseur
 	
 	end
+	print("Exec Ramasseur.body. ")
 	
 end
 

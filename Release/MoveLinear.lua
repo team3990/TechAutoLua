@@ -8,8 +8,8 @@ local distancecible = 0
 
 function m.init(ArgTable)
 		print(ArgTable[1])
-		if ResetEncoder then 
-			ResetEncoder()
+		if PushAction then 
+			PushAction(config.FLAG_ResetEncoder)
 		else 
 			print "gooby pls" -- ResetEncoder n'est pas défini. Quelqu'un exécute probablement ce programme avec le programme générique.
 	
@@ -29,6 +29,7 @@ function m.body()
 	if(distance > distancecible) then
 		MoteurVitesse = -MoteurVitesse 
 	end
+	print("Exec MoveLinear.body. ")
 
 
 end
@@ -40,8 +41,6 @@ function m.isdone()
 		if cond then MoteurVitesse = 0 end
 		return cond
 		
-
-	
 end
 
 

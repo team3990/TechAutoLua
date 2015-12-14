@@ -12,24 +12,14 @@ std::vector<int> actions = std::vector<int>();
 
 
 
-void Lua_PushAction(int flag)
+static int PushAction(lua_State * L)
 {
-	actions.push_back(flag); // Actions exécutées par le programme C++ (ResetEncoder, ResetGyro, etc. )
+	actions.push_back(lua_tointeger(L, -1)); // Actions exécutées par le programme C++ (ResetEncoder, ResetGyro, etc. )
+	return 0;
 }
 
 // Commandes passees directement a lua (d'ou le static)
 
-static int Lua_ResetGyro(lua_State * L)
-{
-	Lua_PushAction(LUAFlag_ResetGyro);
-	return 0;
-}
-
-static int Lua_ResetEncoder(lua_State * L)
-{
-	Lua_PushAction(LUAFlag_ResetEncoder);
-	return 0;
-}
 
 
 
@@ -43,9 +33,6 @@ LuaWrapper::LuaWrapper()
 	L = luaL_newstate();
 
 	LoadFile("AutoFrame.lua");
-
-
-
 
 }
 
@@ -64,11 +51,8 @@ void LuaWrapper::LoadFile(const char * file)
 	luaL_openlibs(L); // Load libs
 	luaL_loadfile(L, file); // Load file
 
-	lua_pushcfunction(L, Lua_ResetEncoder);
-	lua_setglobal(L, "ResetEncoder"); // Set function
-
-	lua_pushcfunction(L, Lua_ResetGyro);
-	lua_setglobal(L, "ResetGyro"); // Set function
+	lua_pushcfunction(L, PushAction);
+	lua_setglobal(L, "PushAction"); // Set function
 
 
 	lua_pcall(L, 0, 0, 0);            // Priming run: Exec script, but keep variables
