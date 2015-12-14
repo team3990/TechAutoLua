@@ -37,9 +37,11 @@ end
 
 function m.isdone()
 		
-		local cond = math.abs(distance - distancecible) < config.VAL_BaseStopValue
-		if cond then MoteurVitesse = 0 end
-		return cond
+		return math.abs(distance - distancecible) < config.VAL_BaseStopValue
+end
+
+function m.whendone()
+		MoteurVitesse = 0
 		
 end
 

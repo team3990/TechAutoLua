@@ -152,6 +152,7 @@ function update()
 		
 	
 	elseif (currentmodule.isdone()) then
+		currentmodule.whendone()
 		RemoveName(currentmodule.rawname)
 		currentmodule = nil -- Supprime le module de la vie.
 		update()
@@ -167,6 +168,7 @@ function update()
 		local parallelmodule = paralleltasks[i]
 		--print("NOM: "..parallelmodule.name)
 		if(parallelmodule.isdone()) then 
+			paralleltasks[i].whendone()
 			paralleltasks[i] = nil; 
 			print("Module name: "..parallelmodule.rawname)
 			RemoveName(parallelmodule.rawname);

@@ -24,12 +24,12 @@ function m.body()
 end
 
 function m.isdone()
-	cond = ((autocounter - startcounter) >= nbloops)
-	if(cond) then 
-		MoteurBras = 0
-			
-	end
-	return cond
+	return ((autocounter - startcounter) >= nbloops)
+	
+end
+
+function m.whendone()
+	MoteurBras = 0
 	
 end
 

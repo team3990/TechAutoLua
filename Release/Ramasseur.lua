@@ -23,18 +23,19 @@ end
 
 
 function m.isdone()
-	cond = ((direction and RamasseurSwitch) or (not direction and (autocounter - startloop) > config.VAL_RamasseurLoops))
-	if cond then 
-		MoteurRamasseur = 0 
-		if(RamasseurSwitch) then 
-			print ("Switch active, ballon a l'interieur")
+	return ((direction and RamasseurSwitch) or (not direction and (autocounter - startloop) > config.VAL_RamasseurLoops))
+
+end
+
+function m.whendone()
+	MoteurRamasseur = 0 
+	if(RamasseurSwitch) then 
+		print ("Switch active, ballon a l'interieur")
 			
-		else
-			print ("Ballon a l'exterieur")
+	else
+		print ("Ballon a l'exterieur")
 		
-		end
 	end
-	return cond
 end
 
 return m

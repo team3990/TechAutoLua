@@ -28,6 +28,7 @@ end
 function m.isdone()
 	for i = #modules, 1, -1 do	
 		if modules[i].isdone() then
+			modules[i].whendone()
 			RemoveName(modules[i].rawname)
 			modules[i] = nil -- Bye bye, once again
 		
@@ -38,6 +39,8 @@ function m.isdone()
 	return (#modules == 0)
 
 end
+
+function m.whendone() end
 	
 
 
