@@ -92,6 +92,8 @@ void LuaWrapper::PushVariable(const char * name, bool value)
 	lua_setglobal(L, name);
 }
 
+
+
 std::vector<int> * LuaWrapper::GetActions()
 {
 	return &actions; // Pour éviter des foirages de link, actions n'est pas dans le .h

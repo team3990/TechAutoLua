@@ -1,7 +1,5 @@
 m = {}
 
-function m.foo() end
-
 -- Files
 m.F_fileformat   = "%s.lua"
 m.F_moduleformat = "%s.lua"
@@ -19,9 +17,10 @@ m.VAL_BaseProxValue    = 20 -- Proximité nécessaire pour que MoveLinear passe 
 m.VAL_BaseStopValue    = 5  -- Proximité à laquelle MoveLinear s'arrête
 
 --Parser
-m.STR_ActionRegex      = "(%([^%)]+%))" -- Trouve la premiere occurence de (...) 
+m.STR_CommandRegex      = "(%([^%)]+%))" -- Trouve la premiere occurence de (...) 
 m.STR_ParallelToken    = "*"
 m.STR_MultitaskToken   = "&"
+m.STR_CommentChar      = "#"
 
 --Flags
 m.FLAG_ResetEncoder    = 1

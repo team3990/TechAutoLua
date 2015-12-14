@@ -1,5 +1,7 @@
 m = {}
 
+currentline = ""
+
 
 -- Pris sur les internets 
 function split(inputstr)
@@ -11,12 +13,14 @@ function split(inputstr)
         end
         return t
 end
-function m.parse(line)
 
+
+function securityparse()
+	line = currentline
 	elements = split(line)
 
 	name = elements[1]
-	for i=2, #elements do	
+	for i = 2, #elements do	
 		str = elements[i]
 		value = nil
 		if str == "true" then
@@ -34,8 +38,21 @@ function m.parse(line)
 
 	end
 	return elements
+
+		
 	
-	
+end
+
+function m.parse(line)
+		currentline = line
+		outcome, result = pcall(securityparse);
+		if(outcome) then return result
+		else
+			print("Bork when parsing line "..line..". Here is the error message: "..result)
+			return {}
+		
+		end
+
 end
 
 return m

@@ -11,7 +11,7 @@ function m.init(ArgTable)
 		if PushAction then 
 			PushAction(config.FLAG_ResetEncoder)
 		else 
-			print "gooby pls" -- ResetEncoder n'est pas défini. Quelqu'un exécute probablement ce programme avec le programme générique.
+			print "PushAction not found.  Please run me with the C++ program. "
 	
 		end
 		

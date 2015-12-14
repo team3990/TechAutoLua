@@ -1,5 +1,5 @@
-LoadTxt    = require "LoadTxt"
-config     = require "config"
+LoadTxt    = dofile "LoadTxt.lua"
+config     = dofile "config.lua"
 
 currentmodule = nil
 paralleltasks = {}
@@ -19,7 +19,7 @@ autocounter      = 0
 RamasseurSwitch  = false
 EstFini          = false
 
-Actions = {}
+Commands = {}
 
 function IsUsed(modulename)
 
@@ -39,74 +39,83 @@ function RemoveName(modulename)
 	
 end
 
-function ReadActions()
+function ReadCommands()
 	local file = io.open(config.F_instrucfile, "r")
-	actiontable = {}
+	commandtable = {}
+	linenumber = 1
 	while 1 do
 		local str = file:read("*line")
 		
-		if str == nil then 
-			break 
+		if str == nil then
+			break -- EOF
+		end
+		
+		str = string.gsub(str, config.STR_CommentChar..".*", "") -- Strip comment line
 		
 		
-		elseif (str:sub(1, 1) == config.STR_ParallelToken) then
+		if (str:sub(1, 1) == config.STR_ParallelToken) then
 			-- Parallel
-			if #actiontable > 0 then 
-				actiontable[#actiontable + 1] = LoadTxt.parse(string.sub(str, 2, -1))
+			if #commandtable > 0 then 
+				result = LoadTxt.parse(string.sub(str, 2, -1))
 
+			else
+				print("Can't run parallel commands like linear commands!")
 			end
 		
 		elseif (str:sub(1, 1) == config.STR_MultitaskToken) then
 			-- Create a multitask object and put stuff in it
 			_index = 1
-			moduletable = {"Multitask"}
-			subaction = ""
-			str = str:sub(2)
+			moduletable = {"Multitask"} -- That's a module like any other
+			subcommand = ""
+			str = str:sub(2) -- Remove the token at the beginning
 			while 1 do
-				_, _index, subaction = string.find(str, config.STR_ActionRegex)
-				if(not subaction) then break end
+				_, _index, subcommand = string.find(str, config.STR_CommandRegex) -- Find first occurence of (...)
+				if(not subcommand) then break end -- Stahpings
 				str = str:sub(_index)
-				moduletable[#moduletable + 1] = subaction:sub(2, -2)
+				moduletable[#moduletable + 1] = subcommand:sub(2, -2)
 				
 
 			end
-			if(#actiontable > 0) then Actions[#Actions + 1] = actiontable; actiontable = {} end
-			actiontable[1] = moduletable
+			if(#commandtable > 0) then Commands[#Commands + 1] = commandtable; commandtable = {} end
+			commandtable[1] = moduletable
 
 			
 		
 
 		else 
-			if(#actiontable > 0) then Actions[#Actions + 1] = actiontable; actiontable = {} end
-			actiontable[1] = LoadTxt.parse(str);
+			if(#commandtable > 0) then Commands[#Commands + 1] = commandtable; commandtable = {} end
+			commandtable[1] = LoadTxt.parse(str);
+			
 		
 		end
+		print("LEN: "..#Commands)
 		
 	end
-	if(#actiontable > 0) then Actions[#Actions + 1] = actiontable; actiontable = {} end
+	if(#commandtable > 0) then Commands[#Commands + 1] = commandtable; commandtable = {} end
 		
 end
 
 
 
-function InitModule(action)
-	if(not IsUsed(action[1])) then
-		print("INIT: "..action[1])
-		usedmodules[#usedmodules + 1] = action[1]
+function InitModule(command)
+	if(#command == 0) then return end
+	if(not IsUsed(command[1])) then -- if a module of the same name is still running, manually block it
+		print("INIT: "..command[1])
+		usedmodules[#usedmodules + 1] = command[1]
 		Argtable = {}
-		for i = 2, #action do 
-			Argtable[#Argtable + 1] = action[i]
+		for i = 2, #command do 
+			Argtable[#Argtable + 1] = command[i]
 
 		end
-		local newmodule = dofile (string.format(config.F_moduleformat, action[1]))
+		local newmodule = dofile (string.format(config.F_moduleformat, command[1]))
 
 		newmodule.init(Argtable)
-		newmodule.rawname = action[1]
+		newmodule.rawname = command[1]
 		return newmodule
 	
 	end
 	
-	print("Module "..action[1].." deja utilise...")
+	print("Module "..command[1].." already running...")
 	return nil
 
 	
@@ -117,31 +126,31 @@ end
 function update()
 	if(currentmodule == nil) then
 		index = index + 1
-		actiontable = Actions[index]
+		commandtable = Commands[index]
 
 		
 		print("---------------------")
-		if actiontable == nil then
+		if commandtable == nil then
 			print("Fin. Lua out!")
 			EstFini = true
 			return
 		end
 		
-		action = actiontable[1]
+		command = commandtable[1]
 
-		print("action "..index)
+		print("command "..index)
 
-		currentmodule = InitModule(action)
+		currentmodule = InitModule(command)
 		if(currentmodule.name ~= nil) then
-			print("Nom de l'action: "..currentmodule.name)
+			print("Command name: "..currentmodule.name)
 		end
 		
-		for i = 2, #actiontable do
-			paralleltasks[#paralleltasks+1] = InitModule(actiontable[i])
+		for i = 2, #commandtable do
+			paralleltasks[#paralleltasks+1] = InitModule(commandtable[i])
 			
 			name = paralleltasks[#paralleltasks].name
 			if(name ~= nil) then
-				print("***Nom de l'action parallele: "..name)		
+				print("***Name of parallel command: "..name)		
 				
 			end
 			
@@ -154,7 +163,7 @@ function update()
 	elseif (currentmodule.isdone()) then
 		currentmodule.whendone()
 		RemoveName(currentmodule.rawname)
-		currentmodule = nil -- Supprime le module de la vie.
+		currentmodule = nil -- Whack teh module!
 		update()
 		
 		
@@ -184,5 +193,5 @@ function update()
 
 end
 
-ReadActions()
+ReadCommands()
 

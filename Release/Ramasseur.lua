@@ -4,6 +4,7 @@ m.name = "moo foo"
 direction = true -- In. Out = false
 startloop      = 0
 function m.init(_direction)
+	print("RAMASSEUR TIME")
 	direction = _direction[1] -- Oui ou non
 	startloop = autocounter + 1 -- Si vers l'extérieur, il utilisera le nombre de tours pour s'arreter. Sinon, il utilisera la switch bidon.
 	if(_direction) then m.name = "Ramasser le ballon" 
