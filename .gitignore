@@ -1,2 +1,5 @@
 Debug/*
 Settings/*
+Release/*.exe
+Release/*.dll
+Release/*.o

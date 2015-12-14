@@ -10,7 +10,7 @@ modules = {}
 function m.init(newactions)
 	name = ""
 	for i = 1, #newactions do
-		modules[#modules + 1] = InitModule(LoadTxt.parse(newactions[i]));
+		modules[#modules + 1] = ModuleLoader.InitModule(LoadTxt.parse(newactions[i]));
 		name = name .. modules[#modules].name .. " "
 	end
 	

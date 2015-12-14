@@ -6,12 +6,12 @@ m.name = "Faire bouger le ballon avec des encodeurs"
 local distancecible = 0
 
 m.InitArgs = {
-	{type(float)}
+	{type(24.5)}, 
+	{type(24)}
 }
 
 
 function m.init(ArgTable)
-		print(ArgTable[1])
 		if PushAction then 
 			PushAction(config.FLAG_ResetEncoder)
 		else 

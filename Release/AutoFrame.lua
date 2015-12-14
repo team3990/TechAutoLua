@@ -1,7 +1,9 @@
-LoadTxt      = dofile "LoadTxt.lua"
-config       = dofile "config.lua"
-ModuleLoader = dofile "ModuleLoader.lua"
+require( "LoadTxt")
+require("config")
+ModuleLoader = require("ModuleLoader")
+Tools = require ("Tools")
 
+print(ModuleLoader)
 
 currentmodule = nil
 paralleltasks = {}
@@ -21,11 +23,11 @@ autocounter      = 0
 RamasseurSwitch  = false
 EstFini          = false
 
-Commands = {} --tridimensional array
+Commands = ModuleLoader.ReadCommands() --tridimensional array
 -- Array of a list of action blocks
 -- Action blocks are list of commands.  First action is a linear command.  Other actions are parallel. 
 -- Actions are arrays with a module name parsed args.
-
+print(#Commands)
 function IsUsed(modulename)
 
 	for i = 1, #usedmodules do
@@ -46,109 +48,7 @@ end
 
 
 
-function ReadCommands()
-	local file = io.open(config.F_instrucfile, "r")
-	commandtable = {}
-	while 1 do
-		local str = file:read("*line")
-		
-		if str == nil then
-			break -- EOF
-		end
-		
-		str = string.gsub(str, config.STR_CommentChar..".*", "") -- Strip comment line
-		if str ~= "" then
-		
-			if (str:sub(1, 1) == config.STR_ParallelToken) then
-				-- Parallel
-				if #commandtable > 0 then 
-					result = LoadTxt.parse(string.sub(str, 2, -1))
-					commandtable[#commandtable + 1] = result
 
-				else
-					print("Can't run parallel commands like linear commands!")
-				end
-			
-			elseif (str:sub(1, 1) == config.STR_MultitaskToken) then
-				-- Create a multitask object and put stuff in it
-				_index = 1
-				moduletable = {"Multitask"} -- That's a module like any other
-				subcommand = ""
-				str = str:sub(2) -- Remove the token at the beginning
-				while 1 do
-					_, _index, subcommand = string.find(str, config.STR_CommandRegex) -- Find first occurence of (...)
-					if(not subcommand) then break end -- Stahpings
-					str = str:sub(_index)
-					moduletable[#moduletable + 1] = subcommand:sub(2, -2)
-					
-
-				end
-				if(#commandtable > 0) then Commands[#Commands + 1] = commandtable; commandtable = {} end
-				commandtable[1] = moduletable
-
-				
-			
-
-			else 
-				if(#commandtable > 0) then Commands[#Commands + 1] = commandtable; commandtable = {} end
-				commandtable[1] = LoadTxt.parse(str);
-				
-			
-			end
-			print("LEN: "..#Commands)
-			
-		end
-	end
-	if(#commandtable > 0) then Commands[#Commands + 1] = commandtable; commandtable = {} end
-		
-end
-
-
-
-function InitModule(command)
-	if(command == nil) then return end
-	if(#command == 0)  then return end
-	if(not IsUsed(command[1])) then -- if a module of the same name is still running, manually block it
-		print("INIT: "..command[1])
-		usedmodules[#usedmodules + 1] = command[1]
-		Argtable = {}
-		for i = 2, #command do 
-			Argtable[#Argtable + 1] = command[i]
-
-		end
-		
-		local newmodule = dofile (string.format(config.F_moduleformat, command[1]))
-
-		
-		
-		if(newmodule.ArgTemplates) then
-			if(not ModuleLoader.AnalyseArgs(Argtable, newmodule.ArgTemplates)) then
-					print("*** Bad arguments: skipping.")
-					return
-			end
-			
-		end
-
-		success, result = pcall(function() newmodule.init(Argtable) end)
-
-		
-		if(not success) then
-			-- Oh dear
-
-			print("*** Sounds like the module is broke, skipping. ")
-			print(result) -- stderr
-			return 
-		end
-		newmodule.rawname = command[1]
-		return newmodule
-	
-	end
-	
-	print("Module "..command[1].." already running...")
-	return nil
-
-	
-end
 
 
 
@@ -156,7 +56,6 @@ function update()
 	if(currentmodule == nil) then
 		index = index + 1
 		commandtable = Commands[index]
-
 		
 		print("---------------------")
 		if commandtable == nil then
@@ -169,7 +68,7 @@ function update()
 
 		print("command "..index)
 
-		currentmodule = InitModule(command)
+		currentmodule = ModuleLoader.InitModule(command)
 		if(currentmodule.name ~= nil) then
 			print("Command name: "..currentmodule.name)
 		end
@@ -217,5 +116,4 @@ function update()
 
 end
 
-ReadCommands()
 
