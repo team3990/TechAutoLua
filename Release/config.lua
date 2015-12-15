@@ -15,6 +15,7 @@ m.OUT_RamasseurSpeed   = 0.5
 m.VAL_RamasseurLoops   = 30 -- Nombre de boucles autonomes pour que le ramasseur cesse d'éjecter
 m.VAL_BaseProxValue    = 20 -- Proximité nécessaire pour que MoveLinear passe en vitesse réduite
 m.VAL_BaseStopValue    = 5  -- Proximité à laquelle MoveLinear s'arrête
+m.VAL_TimePerLoop      = 20 -- In milliseconds
 
 --Parser
 m.STR_CommandRegex      = "(%([^%)]+%))" -- Trouve la premiere occurence de (...). Lire comme (\([^\)]+\))

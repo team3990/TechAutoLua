@@ -5,40 +5,39 @@ Tools        = require("Tools")
 
 m.name = "Multitask "
 
-local moomodules = {}
-m.x = 0
+local modules = {}
 
 -- Good ole functions
 function m.init(newactions)
 	name = ""
 	for i = 1, #newactions do
-		Tools.append(moomodules, ModuleLoader.InitModule(LoadTxt.parse(newactions[i])));
-		name = name .. moomodules[#moomodules].name .. " "
+		Tools.append(modules, ModuleLoader.InitModule(LoadTxt.parse(newactions[i])));
+		name = name .. modules[#modules].name .. " "
 	end
 	
-	print(moomodules[2].body == m.body)
+	print(modules[2].body == m.body)
 	print(name)
 
 end
 
 function m.body()
-	for i = 1, #moomodules do
-		ModuleLoader.CommandBody(moomodules[i])
+	for i = 1, #modules do
+		ModuleLoader.CommandBody(modules[i])
 	end
 end
 
 function m.isdone()
-	for i = #moomodules, 1, -1 do
+	for i = #modules, 1, -1 do
 		
-		if ModuleLoader.CommandIsDone(moomodules[i]) then
-			RemoveName(moomodules[i].rawname)
-			moomodules[i] = nil -- Bye bye, once again
+		if ModuleLoader.CommandIsDone(modules[i]) then
+			RemoveName(modules[i].rawname)
+			modules[i] = nil -- Bye bye, once again
 			
 		end
 	
 	end
-	print("TO RETURN: "..#moomodules)
-	return (#moomodules == 0)
+	print("TO RETURN: "..#modules)
+	return (#modules == 0)
 
 end
 

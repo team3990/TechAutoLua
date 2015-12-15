@@ -45,25 +45,13 @@ function CompareTemplates(template1, template2)
 	
 end
 
-function safecall(func, errmsg)
-	success, result = pcall(func)
-	if(not success) then
-		print(errmsg)
-		print("EXC: "..result)
-		return false
-	
-	else
-		return true, result
-		
-	end
-end
 
 function m.CommandIsDone(_module)
-		state, result = safecall(_module.isdone, string.format("Bork when calling isdone in module %s", _module.rawname))
+		state, result = Tools.safecall(_module.isdone, string.format("Bork when calling isdone in module %s", _module.rawname))
 		if(not state) then return true end
 		
 		if(result) then
-				safecall(_module.whendone, string.format("Bork when calling whendone in module %s", _module.rawname))
+				Tools.safecall(_module.whendone, string.format("Bork when calling whendone in module %s", _module.rawname))
 				return true
 		end
 			
@@ -73,7 +61,7 @@ end
 function m.CommandBody(_module)
 	if(_module == nil) then return end
 	print("In body ".._module.rawname)
-	state, result = safecall(_module.body, string.format("Bork when calling body in module %s", _module.rawname))
+	state, result = Tools.safecall(_module.body, string.format("Bork when calling body in module %s", _module.rawname))
 	if(not state) then _module.isdone = (function() return true end) end -- Let's end this
 end
 
@@ -91,7 +79,7 @@ function m.InitModule(command)
 		print("Command 1: "..command[1])
 		Tools.prettyprinter(Argtable)
 		
-		local result, newmodule = safecall(function() mod = dofile (string.format(config.F_moduleformat, command[1])); return mod end, "Module is broken. ")
+		local result, newmodule = Tools.safecall(function() mod = dofile (string.format(config.F_moduleformat, command[1])); return mod end, "Module is broken. ")
 		if not result then
 			return
 		end
@@ -104,7 +92,7 @@ function m.InitModule(command)
 			end
 			
 		end
-		success, foo = safecall(function() newmodule.init(Argtable) end, "*** Module init threw an exception")
+		success, foo = Tools.safecall(function() newmodule.init(Argtable) end, "*** Module init threw an exception")
 
 		
 		if(not success) then
@@ -157,8 +145,8 @@ function m.ReadCommands()
 		
 		str = string.gsub(str, config.STR_CommentChar..".*", "") -- Strip comment line
 		if str ~= "" then
-		
-			if (str:sub(1, 1) == config.STR_ParallelToken) then
+			local firstchar = str:sub(1, 1)
+			if (firstchar == config.STR_ParallelToken) then
 				-- Parallel
 				if(#Commands[index]) then
 					Tools.append(Commands[index], LoadTxt.parse(string.sub(str, 2, -1)))
@@ -172,7 +160,7 @@ function m.ReadCommands()
 			
 				command = {}
 				
-				if (str:sub(1, 1) == config.STR_MultitaskToken) then
+				if (firstchar == config.STR_MultitaskToken) then
 					-- Create a multitask object and put stuff in it
 					_index = 1
 					moduletable = {"Multitask"} -- That's a module like any other
