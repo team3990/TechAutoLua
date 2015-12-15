@@ -180,7 +180,7 @@ function m.ReadCommands()
 						_, _index, subcommand = string.find(str, config.STR_CommandRegex) -- Find first occurence of (...)
 						if(not subcommand) then break end -- Stahpings
 						str = str:sub(_index)
-						moduletable[#moduletable + 1] = subcommand:sub(2, -2)
+						Tools.append(moduletable, subcommand:sub(2, -2))
 
 					end
 					

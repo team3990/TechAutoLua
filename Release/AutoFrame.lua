@@ -74,8 +74,7 @@ function update()
 		end
 		
 		for i = 2, #commandtable do
-			paralleltasks[#paralleltasks+1] = InitModule(commandtable[i])
-			
+			Tools.append(paralleltasks, InitModule(commandtable[i]))
 			name = paralleltasks[#paralleltasks].name
 			if(name ~= nil) then
 				print("***Name of parallel command: "..name)		

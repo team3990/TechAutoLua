@@ -1,6 +1,7 @@
 m = {}
 LoadTxt      = dofile "LoadTxt.lua"
-ModuleLoader = dofile "ModuleLoader.lua"
+ModuleLoader = require("ModuleLoader")
+Tools        = require("Tools")
 
 m.name = "Multitask "
 
@@ -10,14 +11,11 @@ modules = {}
 function m.init(newactions)
 	name = ""
 	for i = 1, #newactions do
-		modules[#modules + 1] = ModuleLoader.InitModule(LoadTxt.parse(newactions[i]));
+		Tools.append(modules, ModuleLoader.InitModule(LoadTxt.parse(newactions[i])));
 		name = name .. modules[#modules].name .. " "
 	end
 	
 	print(name)
-	
-	
-
 
 end
 
@@ -32,7 +30,6 @@ function m.isdone()
 		if ModuleLoader.CommandIsDone(modules[i]) then
 			RemoveName(modules[i].rawname)
 			modules[i] = nil -- Bye bye, once again
-		
 			
 		end
 	
