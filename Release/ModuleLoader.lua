@@ -72,7 +72,7 @@ end
 
 function m.CommandBody(_module)
 	if(_module == nil) then return end
-	--print("In body ".._module.rawname)
+	print("In body ".._module.rawname)
 	state, result = safecall(_module.body, string.format("Bork when calling body in module %s", _module.rawname))
 	if(not state) then _module.isdone = (function() return true end) end -- Let's end this
 end
@@ -83,13 +83,15 @@ function m.InitModule(command)
 	if(not IsUsed(command[1])) then -- if a module of the same name is still running, manually block it
 		print("INIT: "..command[1])
 		usedmodules[#usedmodules + 1] = command[1]
-		Argtable = {}
+		local Argtable = {}
 		for i = 2, #command do 
 			Argtable[#Argtable + 1] = command[i]
 
 		end
+		print("Command 1: "..command[1])
+		Tools.prettyprinter(Argtable)
 		
-		result, newmodule = safecall(function() mod = dofile (string.format(config.F_moduleformat, command[1])); return mod end, "Module is broken. ")
+		local result, newmodule = safecall(function() mod = dofile (string.format(config.F_moduleformat, command[1])); return mod end, "Module is broken. ")
 		if not result then
 			return
 		end

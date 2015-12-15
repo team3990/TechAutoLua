@@ -17,7 +17,7 @@ m.VAL_BaseProxValue    = 20 -- Proximité nécessaire pour que MoveLinear passe 
 m.VAL_BaseStopValue    = 5  -- Proximité à laquelle MoveLinear s'arrête
 
 --Parser
-m.STR_CommandRegex      = "(%([^%)]+%))" -- Trouve la premiere occurence de (...) 
+m.STR_CommandRegex      = "(%([^%)]+%))" -- Trouve la premiere occurence de (...). Lire comme (\([^\)]+\))
 m.STR_ParallelToken    = "*"
 m.STR_MultitaskToken   = "&"
 m.STR_CommentChar      = "#"

@@ -20,6 +20,4 @@ function m.prettyprinter(_table, indent)
 	print (tabindent.."}")
 end
 
-print("MOO", m.prettyprinter)
-
 return m

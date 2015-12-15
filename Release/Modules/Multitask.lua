@@ -1,40 +1,44 @@
 m = {}
-LoadTxt      = dofile "LoadTxt.lua"
+LoadTxt      = require "LoadTxt"
 ModuleLoader = require("ModuleLoader")
 Tools        = require("Tools")
 
 m.name = "Multitask "
 
-modules = {}
-	
+local moomodules = {}
+m.x = 0
+
 -- Good ole functions
 function m.init(newactions)
 	name = ""
 	for i = 1, #newactions do
-		Tools.append(modules, ModuleLoader.InitModule(LoadTxt.parse(newactions[i])));
-		name = name .. modules[#modules].name .. " "
+		Tools.append(moomodules, ModuleLoader.InitModule(LoadTxt.parse(newactions[i])));
+		name = name .. moomodules[#moomodules].name .. " "
 	end
 	
+	print(moomodules[2].body == m.body)
 	print(name)
 
 end
 
 function m.body()
-	for i = 1, #modules do
-		ModuleLoader.CommandBody(modules[i])
+	for i = 1, #moomodules do
+		ModuleLoader.CommandBody(moomodules[i])
 	end
 end
 
 function m.isdone()
-	for i = #modules, 1, -1 do	
-		if ModuleLoader.CommandIsDone(modules[i]) then
-			RemoveName(modules[i].rawname)
-			modules[i] = nil -- Bye bye, once again
+	for i = #moomodules, 1, -1 do
+		
+		if ModuleLoader.CommandIsDone(moomodules[i]) then
+			RemoveName(moomodules[i].rawname)
+			moomodules[i] = nil -- Bye bye, once again
 			
 		end
 	
 	end
-	return (#modules == 0)
+	print("TO RETURN: "..#moomodules)
+	return (#moomodules == 0)
 
 end
 
