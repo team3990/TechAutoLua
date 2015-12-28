@@ -1,8 +1,4 @@
-#Ramasseur false
-#&(MoveBras 50 true)(Ramasseur false)
-#*MoveLinear 20
-MoveLinear -20
-#MoveLinear 20
-#Ramasseur true
-*MoveBras 500
-WaitForParallel
+Ramasseur false
+*ramasseur false
+&(MoveBras 500)(Ramasseur true)
+

@@ -1,9 +1,11 @@
 m = {}
 m.name = "moo foo"
 
+--[[
 m.ArgTemplates = {
 	{type(true)}
 }
+--]]
 
 direction = true -- In. Out = false
 startloop      = 0

@@ -1,11 +1,7 @@
-config       = require("config")
-ModuleLoader = require("ModuleLoader")
-Tools        = require ("Tools")
-
-currentmodule = nil
-paralleltasks = {}
-
-usedmodules   = {}
+config           = require("config")
+ModuleLoader     = require("ModuleLoader")
+ModuleContainer  = require("ModuleContainer")
+Tools            = require ("Tools")
 
 index = 0
 
@@ -20,31 +16,20 @@ autocounter      = 0
 RamasseurSwitch  = false
 EstFini          = false
 
-Commands = ModuleLoader.ReadCommands() --tridimensional array
+result, Commands = pcall(ModuleLoader.ReadCommands) --tridimensional array
+print(result, Commands)
+Tools.prettyprinter(Commands)
 -- Array of a list of action blocks
 -- Action blocks are list of commands.  First action is a linear command.  Other actions are parallel. 
 -- Actions are arrays with a module name parsed args.
-function IsUsed(modulename)
 
-	for i = 1, #usedmodules do
-		if(usedmodules[i] == modulename) then return true end
-	
-	end
-	return false
-
-end
-
-function RemoveName(modulename)
-	
-	for i = 1, #usedmodules do
-		if(usedmodules[i] == modulename) then usedmodules[i] = nil; break end
-	end
-	
-end
+ModuleContainer.PushContainer("Commands")
+ModuleContainer.PushContainer("Parallel")
 
 
 function update()
-	if(currentmodule == nil) then
+	
+	if(ModuleContainer.GetLength("Commands") == 0) then
 		index = index + 1
 		commandtable = Commands[index]
 		
@@ -55,54 +40,18 @@ function update()
 			return
 		end
 
-		command = commandtable[1]
-
-		print("command "..index)
-
-		currentmodule = ModuleLoader.InitModule(command)
-		if(currentmodule.name ~= nil) then
-			print("Command name: "..currentmodule.name)
-		end
+		if(commandtable[1][1][1] == nil) then
+			ModuleContainer.PushModule("Commands", commandtable[1])
 		
-		for i = 2, #commandtable do
-			Tools.append(paralleltasks, ModuleLoader.InitModule(commandtable[i]))
-			
-			name = paralleltasks[#paralleltasks].name
-			if(name ~= nil) then
-				print("***Name of parallel command: "..name)		
-				
-			end
+		else
+			Tools.foreach(Tools.tableindex(commandtable[1], 1, 0), function(_table) ModuleContainer.PushModule("Commands", _table) end)
 			
 		end
-
+		Tools.foreach(Tools.tableindex(commandtable, 2, 0), function(_table) ModuleContainer.PushModule("Parallel", _table) end)
+		
 	
-	elseif (ModuleLoader.CommandIsDone(currentmodule)) then
-		RemoveName(currentmodule.rawname)
-		currentmodule = nil -- Whack teh module!
-		update()
-		
-		
 	else
-		ModuleLoader.CommandBody(currentmodule)
-		
-		
+		ModuleContainer.update()
 	end
 	
-	for i = #paralleltasks, 1, -1 do
-		local parallelmodule = paralleltasks[i]
-		if(ModuleLoader.CommandIsDone(parallelmodule)) then 
-			RemoveName(parallelmodule.rawname);
-			paralleltasks[i] = nil; 
-			
-		else 
-			ModuleLoader.CommandBody(parallelmodule)
-		end
-	end
-	
-		
-
-		
-
 end
-
-

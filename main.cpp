@@ -1,16 +1,16 @@
-#include <lua.h>                                /* Always include this when calling Lua */
-#include <lauxlib.h>                            /* Always include this when calling Lua */
-#include <lualib.h>                             /* Always include this when calling Lua */
-#include <stdlib.h>
-
-#include "luawrapper.h"
-#include <stdio.h>
+#include "stdlib.h"
+#include "stdio.h"
+#include "cstdlib"
+#include "math.h"
+#include "sys/time.h"
 #include "unistd.h"
 #include "iostream"
-#include <cstdlib>
-#include "math.h"
 
-#include "sys/time.h"
+#include "luawrapper.h"
+
+
+
+void foo();
 
 struct timeval time1;
 
@@ -91,14 +91,6 @@ int main(void) {
 		{
 			break;
 		}
-
-
-
-
-
 	}
-
-
-
 
 }

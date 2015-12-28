@@ -1,8 +1,9 @@
 m = {}
-
 -- Files
+separator = package.config:sub(1, 1)
+m.F_separator = separator
 m.F_fileformat   = "%s.lua"
-m.F_moduleformat = "Modules//%s.lua"
+m.F_moduleformat = string.format("Modules%s.lua", separator.."%s") -- Slightly sketchy
 m.F_instrucfile  = "test.txt"
 
 --Outputs
@@ -26,6 +27,17 @@ m.STR_CommentChar      = "#"
 --Flags
 m.FLAG_ResetEncoder    = 1
 
+--Sys Commands
+m.SYS_dircmd = "dir /B \"%s\""
+tries = {--[["ls %s", "dir /B \"%s\""--]]}
+for i = 1, #tries do
+	x, y, z = os.execute(string.format(tries[i], ""))
+	if(z == 0) then -- Success
+		m.SYS_dircmd = tries[i]
+		break
+	end
+end
 
+tries = nil
 
 return m

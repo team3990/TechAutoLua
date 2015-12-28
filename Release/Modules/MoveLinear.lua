@@ -1,11 +1,11 @@
-require "config"
+config = require("config")
 local m = {}
 
 
 m.name = "Faire bouger le ballon avec des encodeurs"
 local distancecible = 0
 
-m.InitArgs = {
+m.ArgTemplates = {
 	{type(24.5)}, 
 	{type(24)}
 }
@@ -38,7 +38,6 @@ end
 
 
 function m.isdone()
-		
 		return math.abs(distance - distancecible) < config.VAL_BaseStopValue
 end
 

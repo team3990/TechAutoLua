@@ -1,7 +1,7 @@
 local m = {}
 
 
-m.name = "Wait for all parallel commands to be done"
+m.name = "Wait for all parallel commands to be completed"
 
 
 function m.init(ArgTable)
@@ -12,7 +12,7 @@ end
 
 
 function m.isdone()
-		return(#paralleltasks == 0) 
+		return(ModuleContainer.GetLength("parallel") == 0)
 end
 
 function m.whendone()		
