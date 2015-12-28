@@ -113,11 +113,11 @@ end
 function m.deepcopy(orig) return deepcopy(orig) end
 
 -- Found on stack overflow
-function split(inputstr)
-
+function split(inputstr, separator)
+	if(not separator) then separator = "%s" end
         local t = {}
 		i = 1
-        for str in string.gmatch(inputstr, "([^%s]+)") do
+        for str in string.gmatch(inputstr, "([^"..separator.."]+)") do
                 t[i] = str
                 i = i + 1
         end
@@ -125,13 +125,26 @@ function split(inputstr)
         return t
 end
 
-function m.split(inputstr) return split(inputstr) end
+function m.split(inputstr, separator) return split(inputstr, separator) end
 
 function m.listdir(dir)
 	if not config.SYS_dircmd then return {} end
 	if not dir then dir = "" end
 	
 	result = split(io.popen(string.format(config.SYS_dircmd, dir)):read("*a"))
+	if(#result > 0) then
+		x, y = result[1]:find(config.F_separator)
+		if(x) then
+			-- Absolute path is evil
+			newresult = {}
+			for i = 1, #result do
+				splitpath = split(result[i], config.F_separator)
+				newresult[i] = splitpath[#splitpath]
+			end
+			result = newresult
+
+		end
+	end
 	return result
 end
 

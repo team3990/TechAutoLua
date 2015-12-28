@@ -29,7 +29,7 @@ m.FLAG_ResetEncoder    = 1
 
 --Sys Commands
 m.SYS_dircmd = "dir /B \"%s\""
-tries = {--[["ls %s", "dir /B \"%s\""--]]}
+tries = {"ls %s", "dir /B \"%s\""}
 for i = 1, #tries do
 	x, y, z = os.execute(string.format(tries[i], ""))
 	if(z == 0) then -- Success

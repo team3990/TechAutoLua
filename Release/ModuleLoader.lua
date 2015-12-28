@@ -107,6 +107,7 @@ function m.ReadCommands()
 						str = str:sub(_index)
 						Tools.append(command, LoadArguments(subcommand:sub(2, -2)))
 
+
 					end
 				
 				else
@@ -135,8 +136,15 @@ function LoadArguments(arg)
 		arg[i] = value
 		
 	end
+	print(string.rep("-", 50))
+	Tools.prettyprinter(arg)
+	print(string.rep("-", 50))
+	if(#arg > 0) then
+		return LoadModule(arg)
+	else
+		return {}
 
-	return LoadModule(arg)
+	end
 end
 
 function LoadModule(args)
