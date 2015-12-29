@@ -13,7 +13,6 @@ function m.init(ArgTable)
 end
 
 function m.body()
-	print("MoveBras")
 	MoteurBras = config.OUT_MoveBrasSpeed
 	
 	if not direction then

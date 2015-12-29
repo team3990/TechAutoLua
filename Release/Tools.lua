@@ -115,14 +115,15 @@ function m.deepcopy(orig) return deepcopy(orig) end
 -- Found on stack overflow
 function split(inputstr, separator)
 	if(not separator) then separator = "%s" end
-        local t = {}
-		i = 1
-        for str in string.gmatch(inputstr, "([^"..separator.."]+)") do
-                t[i] = str
-                i = i + 1
-        end
+    local t = {}
+	i = 1
+	
+    for str in string.gmatch(inputstr, "([^"..separator.."]+)") do
+        t[i] = str
+        i = i + 1
+    end
 		
-        return t
+    return t
 end
 
 function m.split(inputstr, separator) return split(inputstr, separator) end

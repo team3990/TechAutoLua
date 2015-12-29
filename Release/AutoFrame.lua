@@ -2,7 +2,6 @@ config           = require("config")
 ModuleLoader     = require("ModuleLoader")
 ModuleContainer  = require("ModuleContainer")
 Tools            = require ("Tools")
-
 index = 0
 
 MoteurVitesse    = 0.0
@@ -17,8 +16,7 @@ RamasseurSwitch  = false
 EstFini          = false
 
 result, Commands = pcall(ModuleLoader.ReadCommands) --tridimensional array
-print(result, Commands)
-Tools.prettyprinter(Commands)
+if(not result) then EstFini = true end
 -- Array of a list of action blocks
 -- Action blocks are list of commands.  First action is a linear command.  Other actions are parallel. 
 -- Actions are arrays with a module name parsed args.
@@ -39,19 +37,16 @@ function update()
 			EstFini = true
 			return
 		end
-
-		if(commandtable[1][1][1] == nil) then
-			ModuleContainer.PushModule("Commands", commandtable[1])
 		
-		else
-			Tools.foreach(Tools.tableindex(commandtable[1], 1, 0), function(_table) ModuleContainer.PushModule("Commands", _table) end)
-			
-		end
-		Tools.foreach(Tools.tableindex(commandtable, 2, 0), function(_table) ModuleContainer.PushModule("Parallel", _table) end)
-		
+		ModuleContainer.PushModule("Commands", commandtable[1])
+		ModuleContainer.PushModule("Parallel", Tools.tableindex(commandtable, 2, 0))
 	
 	else
 		ModuleContainer.update()
 	end
 	
 end
+
+
+
+

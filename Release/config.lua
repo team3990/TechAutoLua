@@ -28,6 +28,7 @@ m.STR_CommentChar      = "#"
 m.FLAG_ResetEncoder    = 1
 
 --Sys Commands
+m.SYS_debug  = true
 m.SYS_dircmd = "dir /B \"%s\""
 tries = {"ls %s", "dir /B \"%s\""}
 for i = 1, #tries do
