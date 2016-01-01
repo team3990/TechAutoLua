@@ -11,7 +11,6 @@ MoteurRamasseur  = 0.0
 distance         = 0.0
 autocounter      = 0
 
-
 RamasseurSwitch  = false
 EstFini          = false
 
@@ -25,9 +24,8 @@ ModuleContainer.PushContainer("Commands")
 ModuleContainer.PushContainer("Parallel")
 
 
-function update()
-	
-	if(ModuleContainer.GetLength("Commands") == 0) then
+function _update()
+	if(#ModuleContainer.GetContainer("Commands") == 0) then
 		index = index + 1
 		commandtable = Commands[index]
 		
@@ -35,6 +33,7 @@ function update()
 		if commandtable == nil then
 			print("Fin. Lua out!")
 			EstFini = true
+			logs:close()
 			return
 		end
 		
@@ -42,11 +41,15 @@ function update()
 		ModuleContainer.PushModule("Parallel", Tools.tableindex(commandtable, 2, 0))
 	
 	else
+	
 		ModuleContainer.update()
+		print(distance)
 	end
 	
 end
 
-
-
+function update()
+	x, y = pcall(_update)
+	if not x then io.stdout:write(y) end
+end
 

@@ -84,14 +84,18 @@ end
 function m.safecall(func, errmsg)
 	success, result = pcall(func)
 	if(not success) then
+		print(config.STR_NoticeSeparator)
 		print(errmsg)
-		print("EXC: "..result)
-		return false
-	
-	else
-		return true, result
+		if(result.msg) then result = result.msg end
 		
+		print("EXC: "..result)
+		if(not config.SYS_debug) then
+			error(result)
+		end
+		result = nil
 	end
+	
+	return success, result
 end
 
 -- Found on the internets here: http://lua-users.org/wiki/CopyTable. 

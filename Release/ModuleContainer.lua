@@ -1,4 +1,5 @@
 Tools = require("Tools")
+config = require("config")
 m = {}
 
 local containers = {}
@@ -8,11 +9,15 @@ function PushContainer(name)
 end
 
 function PushModule(name, command)
-	if(command[1][1]) then
-		Tools.foreach(command, function(item) PushModule(name, item) end)-- Do recursion until you get a {module, args} array
+	if(command[1] and not command[1].rawname) then
+	
+		Tools.foreach(command, function(item) PushModule(name, item) end)
 		
 	else
-		result = InitModule(command)
+		if(#command == 0) then return end
+		local success, result = Tools.safecall(function() return InitModule(command) end, "Error when calling init:")
+		if(not success) then return end
+		
 		if(result and result ~= {}) then
 			print("Initialized "..result.rawname)
 			Tools.append(containers[name:lower()], result)
@@ -23,20 +28,19 @@ function PushModule(name, command)
 end
 
 function update()
-	print(string.rep("=", 50))
+	print(config.STR_TextSeparator)
 	print("Updating. ")
 	local modulelist = {}
 	for name, container in pairs(containers) do
-		print(string.rep("*", 10))
+		print(config.STR_SubSeparator)
 		print("In module container: "..name)
 		for i = #container, 1, -1 do
-			command = container[i]
-			name = command.rawname
+			local command = container[i]
+			local name = command.rawname
 			
 			print((#container - i + 1)..". Updating "..name..". ")
 		
-			CommandBody(command)
-			if(CommandIsDone(command)) then
+			if(not CommandBody(command) or CommandIsDone(command)) then
 				print("Command "..name.." is complete!!!")
 				container[i] = nil
 			
@@ -48,19 +52,16 @@ function update()
 	
 end
 
-function GetLength(name)
-	return #containers[name:lower()]
+function GetContainer(name)
+	return containers[name:lower()]
 	
 end
 
 function CommandIsDone(_module)
-	state, result = Tools.safecall(_module.isdone, string.format("Bork when calling isdone in module %s", _module.rawname))
+	local state, result = Tools.safecall(_module.isdone, string.format("Bork when calling isdone in module %s", _module.rawname))
 	if(not state) then 
-	
-		return true 
-	
-
-	end --... Oh shit
+		result = true
+	end
 	
 	if(result) then
 			Tools.safecall(_module.whendone, string.format("Bork when calling whendone in module %s", _module.rawname))
@@ -72,31 +73,33 @@ end
 
 function CommandBody(_module)
 	if(_module == nil) then return end
-	state, result = Tools.safecall(_module.body, string.format("Bork when calling body in module %s", _module.rawname))
-	if(not state) then _module.isdone = (function() return true end) end -- Let's end this
+	local state, result = Tools.safecall(_module.body, string.format("Bork when calling body in module %s", _module.rawname))
+	
+	return state
 end
+
+
 
 function InitModule(command)
 	for name, container in pairs(containers) do	
-		
 		for i = 1, #container do
 			if container[i].parent == command[1] then
-				print("Module already in use")
-				return
+				error({msg = "Module already in use"})
 			end
 		end
 	end
 	args = Tools.tableindex(command, 2, 0)
-	local newmodule = Tools.deepcopy(command[1])
+	local newmodule = Tools.deepcopy(command[1]) -- Clone the base module 
+	
 	newmodule.parent  = command[1]
 	
-	success, foo = Tools.safecall(function() newmodule.init(args) end, "*** Module init threw an exception")
+	success, foo = Tools.safecall(function() newmodule.init(args) end, "Module init threw an exception")
 
 	
 	if(not success) then
-		-- Oh dear
-		return 
+		error({msg = foo})
 	end
+	
 	return newmodule
 
 end
@@ -104,6 +107,6 @@ end
 m.PushContainer = PushContainer
 m.PushModule    = PushModule
 m.update        = update
-m.GetLength     = GetLength
+m.GetContainer  = GetContainer
 
 return m

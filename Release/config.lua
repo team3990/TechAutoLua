@@ -23,6 +23,9 @@ m.STR_CommandRegex      = "(%([^%)]+%))" -- Trouve la premiere occurence de (...
 m.STR_ParallelToken    = "*"
 m.STR_MultitaskToken   = "&"
 m.STR_CommentChar      = "#"
+m.STR_TextSeparator    = string.rep("=", 75)
+m.STR_SubSeparator     = string.rep("-", 40)
+m.STR_NoticeSeparator  = string.rep("*", 20)
 
 --Flags
 m.FLAG_ResetEncoder    = 1

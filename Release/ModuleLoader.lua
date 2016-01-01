@@ -26,7 +26,7 @@ function m.ReadCommands()
 	
 	local file = io.open(config.F_instrucfile, "r")
 	if(not file) then
-		print("Fatal error: Could not open file "..config.F_instrucfile)
+		print("Fatal error: Could not open command file "..config.F_instrucfile)
 		error({})
 	end
 	
@@ -125,9 +125,9 @@ function AnalyseLine(line)
 
 end
 function LoadArguments(arg)
-	print(string.rep("=", 75))
+	print(config.STR_TextSeparator)
 	
-	-- Like a split, but supports strings
+	-- Like a normal whitespace split, but supports strings
 	splittedline = {}
 	current = ""
 	isstring = false
@@ -159,6 +159,7 @@ function LoadArguments(arg)
 	if(#current > 0) then Tools.append(splittedline, current) end
 
 	arg = splittedline
+	
 	
 	for i = 2, #arg do
 		func = loadstring("value="..arg[i]) -- Slightly hackish, but saves a lot of work

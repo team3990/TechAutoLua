@@ -1,4 +1,4 @@
-&(MoveBras 15)(Ramasseur true)
-*MoveLinear 20
-WaitForParallel
+Ramasseur true
+*Ramasseur true
+
 

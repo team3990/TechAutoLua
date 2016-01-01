@@ -86,13 +86,18 @@ There's more advanced stuff you can do.
 	Will run several commands at the same time, but won't continue to the next level until all commands are done. Defined with a &. Example:
 	&(foo 2)(foobar)
 	foobarbaz
-	Will run foo with arg 2 and foobar.  When both are done, it will execute foobarbaz. 
+	Will run foo with arg 2 and will run foobar.  When both are complete, foobarbaz will be ran.
 	
 -Comments
-	Work exactly like C++ or Lua commands: Everything past # on a line will be discarded. 
+	Work exactly like C++ or Lua commands: Everything past # in a line will be discarded. 
 	
 3) Lua side
 Used to define commands.  Every command name refers to the filename of a module. 
 If we write "foo 2" in the command file, AutoFrame.lua will interpret it as "Open foo.lua and call foo.init() with [2]".  
+To define a module, create a lua file with your command's name in Modules/.  
+
+How this works is:
+When the lua side is called for the first time, it reads the command file, executes all the modules and stores them in a table.  Every module is ran only once.  
+Then, when it comes to executing the command, it will deepcopy the original module and call init(). Then, on the following loops, it will run body(), and run IsDone(). If IsDone() returns true or returns an exception, it will call whendone() and repeat the process for the next module.
 
 	
