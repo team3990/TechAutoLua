@@ -1,5 +1,5 @@
 &(Ramasseur true)   (MoveLinear 500)
-*MoveBras 20
+*MoveBras foo
 WaitForParallel
 
 

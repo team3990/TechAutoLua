@@ -21,6 +21,24 @@ function m.ReadCommands()
 		{[module foobarbaz], 4}
 	  }
 	 }
+	 
+	 &(foo 2) (foobar 3)
+	 *foobarbaz 4
+	 
+	********INTO:*************
+	
+	{
+		{
+			{
+				{[module foo], 2}, 
+				{[module foobar], 3}
+			}, 
+			{
+				{[module foobarbaz], 4}
+			}
+		}
+	}
+	
 	
 	--]]
 	
@@ -36,7 +54,6 @@ function m.ReadCommands()
 	while 1 do
 
 		local str = file:read("*line")
-		
 		if not str then
 			break -- EOF
 		end
@@ -103,7 +120,7 @@ function AnalyseLine(line)
 				for i = 1, #commands do
 					cmd = LoadArguments(commands[i]:sub(2, -2))
 	
-					if(Tools.count(used, cmd[i]) > 0) then
+					if(Tools.count(used, cmd[i]) > 0 and not cmd[i].AllowMultiCommands) then
 						error({msg = "Can't run multiple instances of command at the same time ..."})
 					
 					else
@@ -165,6 +182,9 @@ function LoadArguments(arg)
 		end
 		
 		func()
+		if(not value) then
+			error({msg = string.format("Couldn't parse argument #u %s: Argument is equal to nil. ", i, arg[i])})
+		end
 		arg[i] = value
 		
 	end
@@ -198,7 +218,7 @@ function LoadModule(args)
 		for i = 1, #files do
 			filename = files[i]
 			
-			if(filename[#name + 1] == '.') then -- To make sure "foobar.lua" doesn't match "foo"
+			if(filename[#name + 1] == '.') then -- To make sure that "foobar.lua" doesn't match "foo"
 				filename = filename:sub(1, #name)
 
 				if(filename:lower() == name:lower()) then
@@ -214,12 +234,11 @@ function LoadModule(args)
 			if(not result) then -- Börk
 				error({msg = "Caught exception when loading module: "..newmodule})
 			end
-
 			
 			newmodule.rawname = name
 			PreloadedModules[name:lower()] = newmodule -- A new module is born
 		else 
-			error({msg = "Path not found in Modules/. "})
+			error({msg = "Path not found. "})
 		end
 	end
 

@@ -1,7 +1,9 @@
+print("Bleh")
 config           = require("config")
 ModuleLoader     = require("ModuleLoader")
 ModuleContainer  = require("ModuleContainer")
 Tools            = require ("Tools")
+print("Bleh")
 dofile("stringops.lua")
 z = "aaa"
 
@@ -17,11 +19,9 @@ autocounter      = 0
 RamasseurSwitch  = false
 EstFini          = false
 
-result, Commands = pcall(ModuleLoader.ReadCommands) --tridimensional array
+result, Commands = pcall(ModuleLoader.ReadCommands)
 if(not result) then EstFini = true end
--- Array of a list of action blocks
--- Action blocks are list of commands.  First action is a linear command.  Other actions are parallel. 
--- Actions are arrays with a module name parsed args.
+
 
 MainCommands = ModuleContainer.InitContainer()
 Parallels    = ModuleContainer.InitContainer()

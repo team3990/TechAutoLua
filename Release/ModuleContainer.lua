@@ -34,23 +34,26 @@ function containerclass.PushCommand(container, command)
 end
 
 function InitModule(command)
-	for i = 1, #UsedModules do	
-		if(UsedModules[i] == command[1]) then
-			error({msg = "Module already in use"}) -- To prevent undefined behavior
+
+	if(not command[1].AllowMultiCommands) then
+		for i = 1, #UsedModules do	
+			if(UsedModules[i] == command[1]) then
+				error({msg = "Module already in use"}) -- To prevent undefined behavior
+			end
 		end
+		
+		Tools.append(UsedModules, command[1])
 	end
-	
-	Tools.append(UsedModules, command[1])
-	
+		
 	args = Tools.tableindex(command, 2, 0)
 	local newmodule = Tools.deepcopy(command[1]) -- Clone the base module 
 	
 	newmodule.parent  = command[1]
-	success, foo = Tools.safecall(function() newmodule.init(args) end, "Module init threw an exception")
+	success, _error = Tools.safecall(function() newmodule.init(args) end, "Module init threw an exception")
 
 	
 	if(not success) then
-		error({msg = foo})
+		error({msg = _error})
 	end
 	
 	return newmodule
@@ -59,7 +62,7 @@ end
 
 
 function containerclass.update(container)
-	for i = #container, 1, -1 do
+	for i = 1, #container do
 		local command = container[i]
 		local name = command.rawname
 		
