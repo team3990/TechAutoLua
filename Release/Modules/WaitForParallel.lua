@@ -21,16 +21,16 @@ end
 
 
 function m.isdone()
-		container = ModuleContainer.GetContainer("parallel")
 		
-		if(#container == 0) then return true
+		if(#Parallels == 0) then 
+			return true
 		elseif(not cmd)     then return false
 		end
 		
 		for i = #cmd, 1, -1 do
 			rawname = cmd[i]
-			for i = 1, #container do
-				if(container[i].rawname == rawname) then
+			for i = 1, #Parallels do
+				if(Parallels[i].rawname == rawname) then
 					cmd[i] = nil
 					break
 				end

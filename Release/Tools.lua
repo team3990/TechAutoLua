@@ -2,9 +2,6 @@ require("config")
 m = {}
 
 
-function m.getindex(str, _index)
-	return #str > _index - 1 and str:sub(_index, _index) or ""
-end
 
 -- Table functions lua badly lacks
 function m.append(_table, item)
@@ -29,10 +26,21 @@ end
 
 
 function m.remove(_table, item)
-	for i = _table, 1, -1 do
-		if(_table[i] == item) then _table[i] = nil end
+	newtable = {}
+	for i = 1, #_table do
+		if(_table[i] ~= item) then newtable[#newtable + 1] = _table[i] end
 	
 	end
+	
+	for i = 1, #_table do
+		if(i <= #newtable) then
+			_table[i] = newtable[i]
+			
+		else
+			_table[i] = nil
+		end
+	end
+
 end
 
 function m.tableindex(_table, start, _end)
@@ -116,27 +124,11 @@ end
 
 function m.deepcopy(orig) return deepcopy(orig) end
 
--- Found on stack overflow
-function split(inputstr, separator)
-	if(not separator) then separator = "%s" end
-    local t = {}
-	i = 1
-	
-    for str in string.gmatch(inputstr, "([^"..separator.."]+)") do
-        t[i] = str
-        i = i + 1
-    end
-		
-    return t
-end
-
-function m.split(inputstr, separator) return split(inputstr, separator) end
-
 function m.listdir(dir)
 	if not config.SYS_dircmd then return {} end
 	if not dir then dir = "" end
 	
-	result = split(io.popen(string.format(config.SYS_dircmd, dir)):read("*a"))
+	result = io.popen(string.format(config.SYS_dircmd, dir)):read("*a"):split()
 	if(#result > 0) then
 		x, y = result[1]:find(config.F_separator)
 		if(x) then
@@ -152,6 +144,8 @@ function m.listdir(dir)
 	end
 	return result
 end
+
+
 
 
 return m

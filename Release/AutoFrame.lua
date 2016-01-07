@@ -2,6 +2,9 @@ config           = require("config")
 ModuleLoader     = require("ModuleLoader")
 ModuleContainer  = require("ModuleContainer")
 Tools            = require ("Tools")
+dofile("stringops.lua")
+z = "aaa"
+
 index = 0
 
 MoteurVitesse    = 0.0
@@ -20,30 +23,31 @@ if(not result) then EstFini = true end
 -- Action blocks are list of commands.  First action is a linear command.  Other actions are parallel. 
 -- Actions are arrays with a module name parsed args.
 
-ModuleContainer.PushContainer("Commands")
-ModuleContainer.PushContainer("Parallel")
-
+MainCommands = ModuleContainer.InitContainer()
+Parallels    = ModuleContainer.InitContainer()
 
 function _update()
-	if(#ModuleContainer.GetContainer("Commands") == 0) then
+	print(config.STR_TextSeparator)
+	print("Loop #"..autocounter)
+	if(#MainCommands == 0) then
 		index = index + 1
 		commandtable = Commands[index]
-		
-		print("---------------------")
 		if commandtable == nil then
 			print("Fin. Lua out!")
 			EstFini = true
-			logs:close()
 			return
 		end
 		
-		ModuleContainer.PushModule("Commands", commandtable[1])
-		ModuleContainer.PushModule("Parallel", Tools.tableindex(commandtable, 2, 0))
+		MainCommands:PushCommand(commandtable[1])
+		Parallels:PushCommand(Tools.tableindex(commandtable, 2, 0))
 	
 	else
-	
-		ModuleContainer.update()
-		print(distance)
+		print("Parallel commands: ")
+		Parallels:update()
+		print(config.STR_SubSeparator)
+		print("Normal commands: ")
+		MainCommands:update()
+		
 	end
 	
 end

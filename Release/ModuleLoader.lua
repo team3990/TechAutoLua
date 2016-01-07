@@ -41,45 +41,45 @@ function m.ReadCommands()
 			break -- EOF
 		end
 		
-		if #str > 0 then
-			results = {pcall(function() return AnalyseLine(str) end)}
-			if not results[1] then
-				if results[2].msg then
-					print("Failed to load line: "..results[2].msg)
-				else
-					print("Caught error when loading line: "..results[2])
-				end
-				
-				if not config.SYS_debug then
-					error(results[2])
-				end
-
-				
+		results = {pcall(function() return AnalyseLine(str) end)}
+		if not results[1] then
+			if results[2].msg then
+				print("Failed to load line: "..results[2].msg)
 			else
-				_table = results[2]
-				newblock = results[3]
-				
-				if newblock then
-					Tools.append(Commands, {})
-				end
-				
-				if(#Commands == 0) then
-					print("Error: Can't use standalone parallel commands")
-				
-				else
-					print("Load succeeded.")
-					Tools.append(Commands[#Commands], _table)
-					
-				end
+				print("Caught error when loading line: "..results[2])
 			end
-					
+			
+			if not config.SYS_debug then
+				error(results[2])
+			end
+
+			
+		else
+			_table = results[2]
+			newblock = results[3]
+			
+			if newblock then
+				Tools.append(Commands, {})
+			end
+			
+			if(#Commands == 0) then
+				print("Error: Can't use standalone parallel commands")
+			
+			elseif _table then
+				
+				Tools.append(Commands[#Commands], _table)
+				
+			end
 		end
+
 	end
 	return Commands
 end
 
 function AnalyseLine(line)
 		line = string.gsub(line, config.STR_CommentChar..".*", "") -- Strip comment line
+		if(not line:match("%S")) then return end -- There's no point in parsing an empty line
+		
 		local firstchar = line:sub(1, 1)
 		local result    = {}
 		local newblock  = false
@@ -94,21 +94,20 @@ function AnalyseLine(line)
 			
 			if (firstchar == config.STR_MultitaskToken) then
 				-- Create a multitask object and put stuff in it
-				_index = 1
 				
+				_index = 1
+
+				local commands = line:findall(config.STR_CommandRegex)
 				used = {}
 				
-				while 1 do
-					_, _index, subcommand = string.find(line, config.STR_CommandRegex) -- Find first occurence of (...)
-					if(not subcommand) then break end -- Stahpings
-					line = line:sub(_index)
-					cmd = LoadArguments(subcommand:sub(2, -2))
-
-					if(Tools.count(used, cmd[1]) > 0) then
+				for i = 1, #commands do
+					cmd = LoadArguments(commands[i]:sub(2, -2))
+	
+					if(Tools.count(used, cmd[i]) > 0) then
 						error({msg = "Can't run multiple instances of command at the same time ..."})
 					
 					else
-						Tools.append(used, cmd[1])
+						Tools.append(used, cmd[i])
 						Tools.append(result, cmd)
 					
 					end
@@ -125,14 +124,12 @@ function AnalyseLine(line)
 
 end
 function LoadArguments(arg)
-	print(config.STR_TextSeparator)
-	
 	-- Like a normal whitespace split, but supports strings
 	splittedline = {}
 	current = ""
 	isstring = false
 	for i = 1, #arg do
-		_char = arg:sub(i, i)
+		_char = arg[i]
 		if(_char == "\"") then
 			if(isstring) then
 				current = current .. "\""
@@ -160,7 +157,7 @@ function LoadArguments(arg)
 
 	arg = splittedline
 	
-	
+	-- Load arguments to module
 	for i = 2, #arg do
 		func = loadstring("value="..arg[i]) -- Slightly hackish, but saves a lot of work
 		if(not func) then
@@ -178,6 +175,8 @@ function LoadArguments(arg)
 		error({msg = "Empty args"})
 
 	end
+	
+	print("Load Succeeded")
 end
 
 function LoadModule(args)
@@ -199,7 +198,7 @@ function LoadModule(args)
 		for i = 1, #files do
 			filename = files[i]
 			
-			if(Tools.getindex(filename, #name + 1) == ".") then -- To make sure "foobar.lua" doesn't match "foo"
+			if(filename[#name + 1] == '.') then -- To make sure "foobar.lua" doesn't match "foo"
 				filename = filename:sub(1, #name)
 
 				if(filename:lower() == name:lower()) then
